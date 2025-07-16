@@ -1,0 +1,89 @@
+---
+// src/pages/dashboard/mensajes/index.astro
+import Layout from "../../../layouts/Layout.astro"; // Adjust path as needed
+import { PrismaClient } from "@prisma/client";
+
+export const prerender = false;
+
+const prisma = new PrismaClient();
+
+// Fetch all conversations, ordered by the most recently updated.
+const conversations = await prisma.conversation.findMany({
+    orderBy: {
+        updatedAt: "desc",
+    },
+});
+---
+
+<Layout title="Dashboard - Mensajes">
+    <main class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10">
+                <h1 class="text-4xl font-bold text-gray-800">
+                    Bandeja de Entrada
+                </h1>
+                <p class="text-lg text-gray-500">
+                    Conversaciones iniciadas desde el formulario de contacto.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg">
+                <ul class="divide-y divide-gray-200">
+                    {
+                        conversations.length > 0 ? (
+                            conversations.map((conversation) => (
+                                <li>
+                                    <a
+                                        href={`/dashboard/mensajes/${conversation.id}`}
+                                        class="block p-6 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex items-center gap-4">
+                                                {conversation.status ===
+                                                    "OPEN" && (
+                                                    <span
+                                                        class="h-2.5 w-2.5 bg-blue-500 rounded-full flex-shrink-0"
+                                                        title="Conversación abierta"
+                                                    />
+                                                )}
+                                                <div>
+                                                    <p class="font-semibold text-gray-800">
+                                                        {
+                                                            conversation.contactName
+                                                        }
+                                                    </p>
+                                                    <p class="text-sm text-gray-600 truncate max-w-xs sm:max-w-md md:max-w-lg">
+                                                        {conversation.subject}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right flex-shrink-0 ml-4">
+                                                <time
+                                                    datetime={conversation.updatedAt.toISOString()}
+                                                    class="text-xs text-gray-500"
+                                                >
+                                                    {new Date(
+                                                        conversation.updatedAt,
+                                                    ).toLocaleString("es-AR", {
+                                                        day: "2-digit",
+                                                        month: "2-digit",
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                </time>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            ))
+                        ) : (
+                            <li class="p-8 text-center text-gray-500">
+                                No hay conversaciones.
+                            </li>
+                        )
+                    }
+                </ul>
+            </div>
+        </div>
+    </main>
+</Layout>

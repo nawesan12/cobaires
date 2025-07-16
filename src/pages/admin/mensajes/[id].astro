@@ -1,0 +1,181 @@
+---
+// src/pages/dashboard/mensajes/[id].astro
+import Layout from "../../../layouts/Layout.astro"; // Adjust path as needed
+import { PrismaClient } from "@prisma/client";
+
+export const prerender = false;
+const prisma = new PrismaClient();
+
+const { id } = Astro.params;
+
+const conversation = await prisma.conversation.findUnique({
+    where: { id: Number(id) },
+    include: {
+        replies: {
+            orderBy: {
+                createdAt: "asc",
+            },
+        },
+    },
+});
+
+if (!conversation) {
+    return new Response("Conversation not found", { status: 404 });
+}
+---
+
+<Layout title={`Dashboard - Conversación con ${conversation.contactName}`}>
+    <main class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <a
+                    href="/dashboard/mensajes"
+                    class="text-blue-600 hover:underline mb-4 inline-block"
+                    >&larr; Volver a Bandeja de Entrada</a
+                >
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Conversación con {conversation.contactName}
+                </h1>
+                <p class="text-lg text-gray-500">{conversation.subject}</p>
+                <div class="mt-2 text-sm text-gray-500">
+                    <span>{conversation.contactEmail}</span>
+                    {
+                        conversation.phone && (
+                            <span> &bull; {conversation.phone}</span>
+                        )
+                    }
+                </div>
+            </div>
+
+            <!-- Conversation Thread -->
+            <div class="space-y-6">
+                <!-- Initial Message -->
+                <div
+                    class="bg-white p-5 rounded-lg shadow-sm border border-blue-200"
+                >
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-900">
+                            {conversation.contactName}
+                        </p>
+                        <time
+                            datetime={conversation.createdAt.toISOString()}
+                            class="text-xs text-gray-500"
+                        >
+                            {
+                                new Date(conversation.createdAt).toLocaleString(
+                                    "es-AR",
+                                )
+                            }
+                        </time>
+                    </div>
+                    <p class="text-gray-700 whitespace-pre-line">
+                        {conversation.initialMessage}
+                    </p>
+                </div>
+
+                <!-- Replies -->
+                {
+                    conversation.replies.map((reply) => (
+                        <div
+                            class:list={[
+                                "p-5 rounded-lg shadow-sm",
+                                {
+                                    "bg-blue-50 ml-auto max-w-[90%]":
+                                        reply.direction === "OUTBOUND",
+                                }, // Your replies
+                                {
+                                    "bg-white max-w-[90%]":
+                                        reply.direction === "INBOUND",
+                                }, // Their replies (future use)
+                            ]}
+                        >
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="font-semibold text-gray-900">
+                                    {reply.direction === "OUTBOUND"
+                                        ? "Tu Respuesta"
+                                        : conversation.contactName}
+                                </p>
+                                <time
+                                    datetime={reply.createdAt.toISOString()}
+                                    class="text-xs text-gray-500"
+                                >
+                                    {new Date(reply.createdAt).toLocaleString(
+                                        "es-AR",
+                                    )}
+                                </time>
+                            </div>
+                            <p class="text-gray-700 whitespace-pre-line">
+                                {reply.content}
+                            </p>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Reply Form -->
+            <div class="mt-10 pt-6 border-t">
+                <h2 class="text-xl font-semibold mb-4">Responder</h2>
+                <form id="reply-form" class="space-y-4">
+                    <input
+                        type="hidden"
+                        name="conversationId"
+                        value={conversation.id}
+                    />
+                    <textarea
+                        name="content"
+                        id="reply-content"
+                        rows="6"
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                        placeholder="Escribí tu respuesta..."></textarea>
+                    <div class="text-right">
+                        <button
+                            type="submit"
+                            id="submit-reply"
+                            class="inline-flex items-center justify-center py-2 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 transition"
+                        >
+                            Enviar Respuesta
+                        </button>
+                    </div>
+                </form>
+                <div id="status-message" class="mt-4 text-center font-medium">
+                </div>
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    const replyForm = document.getElementById("reply-form");
+    const submitButton = document.getElementById("submit-reply");
+    const statusMessage = document.getElementById("status-message");
+
+    replyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = "Enviando...";
+        statusMessage.textContent = "";
+
+        const formData = new FormData(replyForm);
+
+        try {
+            const response = await fetch("/api/replies", {
+                method: "POST",
+                body: formData,
+            });
+            const result = await response.json();
+
+            if (!response.ok)
+                throw new Error(result.message || "Algo salió mal.");
+
+            // Reload the page to show the new reply
+            window.location.reload();
+        } catch (error) {
+            statusMessage.textContent = error.message;
+            statusMessage.classList.add("text-red-600");
+            submitButton.disabled = false;
+            submitButton.textContent = "Enviar Respuesta";
+        }
+    });
+</script>
