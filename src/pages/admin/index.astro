@@ -1,0 +1,274 @@
+---
+// src/pages/dashboard/proyectos/nuevo.astro
+import Layout from "../../layouts/Layout.astro"; // Adjust path as needed
+
+// This page should be protected by authentication in a real application.
+---
+
+<Layout title="Dashboard - Nuevo Proyecto">
+    <main class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-10">
+                <h1 class="text-4xl font-bold text-gray-800">
+                    Panel de Control
+                </h1>
+                <p class="text-lg text-gray-500">
+                    Añadir un nuevo proyecto al portfolio.
+                </p>
+            </div>
+
+            <!-- Form Container -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                <form id="project-form" class="space-y-6">
+                    <!-- Title -->
+                    <div>
+                        <label
+                            for="title"
+                            class="block text-sm font-medium text-gray-700 mb-1"
+                            >Título del Proyecto</label
+                        >
+                        <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        />
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label
+                            for="description"
+                            class="block text-sm font-medium text-gray-700 mb-1"
+                            >Descripción</label
+                        >
+                        <textarea
+                            name="description"
+                            id="description"
+                            rows="5"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                        ></textarea>
+                    </div>
+
+                    <!-- Year and Location -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                for="year"
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Año</label
+                            >
+                            <input
+                                type="text"
+                                name="year"
+                                id="year"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="location"
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Ubicación</label
+                            >
+                            <input
+                                type="text"
+                                name="location"
+                                id="location"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Image Upload -->
+                    <div>
+                        <label
+                            for="image"
+                            class="block text-sm font-medium text-gray-700 mb-1"
+                            >Imagen Principal</label
+                        >
+                        <div
+                            id="image-drop-zone"
+                            class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
+                        >
+                            <div
+                                id="upload-prompt"
+                                class="space-y-1 text-center"
+                            >
+                                <svg
+                                    class="mx-auto h-12 w-12 text-gray-400"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    viewBox="0 0 48 48"
+                                    aria-hidden="true"
+                                    ><path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></path></svg
+                                >
+                                <div class="flex text-sm text-gray-600">
+                                    <label
+                                        for="image-upload"
+                                        class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                                    >
+                                        <span>Subir un archivo</span>
+                                        <input
+                                            id="image-upload"
+                                            name="image"
+                                            type="file"
+                                            class="sr-only"
+                                            required
+                                            accept="image/png, image/jpeg, image/webp"
+                                        />
+                                    </label>
+                                    <p class="pl-1">o arrastrar y soltar</p>
+                                </div>
+                                <p class="text-xs text-gray-500">
+                                    PNG, JPG, WEBP hasta 10MB
+                                </p>
+                            </div>
+                            <div
+                                id="image-preview-container"
+                                class="hidden text-center"
+                            >
+                                <img
+                                    id="image-preview"
+                                    src="#"
+                                    alt="Image Preview"
+                                    class="mx-auto max-h-32 rounded-md mb-2"
+                                />
+                                <p id="file-name" class="text-sm text-gray-600">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-right">
+                        <button
+                            type="submit"
+                            id="submit-button"
+                            class="inline-flex items-center justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition disabled:bg-gray-400"
+                        >
+                            <span id="button-text">Crear Proyecto</span>
+                            <svg
+                                id="button-spinner"
+                                class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                ><circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"></circle><path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path></svg
+                            >
+                        </button>
+                    </div>
+                </form>
+                <!-- Status Message Area -->
+                <div id="status-message" class="mt-6 text-center font-medium">
+                </div>
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    const form = document.getElementById("project-form");
+    const submitButton = document.getElementById("submit-button");
+    const buttonText = document.getElementById("button-text");
+    const buttonSpinner = document.getElementById("button-spinner");
+    const statusMessage = document.getElementById("status-message");
+
+    const imageDropZone = document.getElementById("image-drop-zone");
+    const imageUpload = document.getElementById("image-upload");
+    const uploadPrompt = document.getElementById("upload-prompt");
+    const imagePreviewContainer = document.getElementById(
+        "image-preview-container",
+    );
+    const imagePreview = document.getElementById("image-preview");
+    const fileNameDisplay = document.getElementById("file-name");
+
+    function handleFile(file) {
+        if (file) {
+            uploadPrompt.classList.add("hidden");
+            imagePreviewContainer.classList.remove("hidden");
+            fileNameDisplay.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    imageDropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        imageDropZone.classList.add("border-blue-500", "bg-blue-50");
+    });
+    imageDropZone.addEventListener("dragleave", () => {
+        imageDropZone.classList.remove("border-blue-500", "bg-blue-50");
+    });
+    imageDropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        imageDropZone.classList.remove("border-blue-500", "bg-blue-50");
+        if (e.dataTransfer.files.length > 0) {
+            imageUpload.files = e.dataTransfer.files;
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    imageUpload.addEventListener("change", () => {
+        if (imageUpload.files.length > 0) {
+            handleFile(imageUpload.files[0]);
+        }
+    });
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        buttonText.textContent = "Creando...";
+        buttonSpinner.classList.remove("hidden");
+        statusMessage.textContent = "";
+        statusMessage.className = "mt-6 text-center font-medium";
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch("/api/projects", {
+                method: "POST",
+                body: formData,
+            });
+            const result = await response.json();
+
+            if (!response.ok)
+                throw new Error(result.message || "Algo salió mal.");
+
+            statusMessage.textContent = "¡Proyecto creado con éxito!";
+            statusMessage.classList.add("text-green-600");
+            form.reset();
+            uploadPrompt.classList.remove("hidden");
+            imagePreviewContainer.classList.add("hidden");
+            imagePreview.src = "#";
+        } catch (error) {
+            statusMessage.textContent = error.message;
+            statusMessage.classList.add("text-red-600");
+        } finally {
+            setTimeout(() => {
+                submitButton.disabled = false;
+                buttonText.textContent = "Crear Proyecto";
+                buttonSpinner.classList.add("hidden");
+            }, 1000);
+        }
+    });
+</script>
