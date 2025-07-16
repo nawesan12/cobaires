@@ -130,6 +130,12 @@ import Layout from "../layouts/Layout.astro";
         "submit-button",
     ) as HTMLButtonElement;
 
+    // Reemplazá estos con los tuyos
+    // Obtenelos desde el panel del formulario en HubSpot
+
+    const HUBSPOT_PORTAL_ID = "50272950";
+    const HUBSPOT_FORM_ID = "980d41bf-27cb-4c5a-b1d9-23b0ab7af66f";
+
     // --- Form Validation ---
     const validateForm = (): boolean => {
         let isValid = true;
@@ -166,28 +172,53 @@ import Layout from "../layouts/Layout.astro";
 
     // --- Placeholder Submission Function ---
     // This function runs when the form is successfully validated.
-    const handleFormSubmit = () => {
-        console.log("Form submission successful. Data:");
-        const formData = new FormData(contactForm);
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
-        // --- UI Update on Success ---
-        // 1. Disable the button to prevent repeated submissions.
+    const handleFormSubmit = async () => {
         submitButton.disabled = true;
+        submitButton.innerText = "Enviando...";
 
-        // 2. Change the button's text.
-        submitButton.innerHTML =
-            "¡Mensaje enviado correctamente!<br>Te responderemos a la brevedad.";
+        const formData = new FormData(contactForm);
 
-        // 3. Make the button full-width by removing the responsive width class.
-        submitButton.classList.remove("lg:w-1/2");
-        submitButton.classList.add("w-full");
+        // Adaptar los campos según lo que espera HubSpot
+        const data = {
+            fields: [
+                { name: "firstname", value: formData.get("nombre") },
+                { name: "lastname", value: formData.get("apellido") },
+                { name: "telefono", value: formData.get("telefono") },
+                { name: "email", value: formData.get("email") },
+                { name: "mensaje", value: formData.get("mensaje") },
+            ],
+            context: {
+                pageUri: window.location.href,
+                pageName: document.title,
+            },
+        };
 
-        contactForm.reset();
+        try {
+            const response = await fetch(
+                `https://api.hsforms.com/submissions/v3/integration/submit/${HUBSPOT_PORTAL_ID}/${HUBSPOT_FORM_ID}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                },
+            );
 
-        // The background color change is handled by the `disabled:bg-green-500` class in the HTML.
+            if (response.ok) {
+                submitButton.innerHTML =
+                    "¡Mensaje enviado correctamente!<br>Te responderemos a la brevedad.";
+                submitButton.classList.remove("lg:w-1/2");
+                submitButton.classList.add("w-full");
+                contactForm.reset();
+            } else {
+                throw new Error("HubSpot API Error");
+            }
+        } catch (err) {
+            submitButton.innerText = "Hubo un error. Intentá de nuevo.";
+            submitButton.disabled = false;
+            console.error(err);
+        }
     };
 
     // --- Event Listener ---
