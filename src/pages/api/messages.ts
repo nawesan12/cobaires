@@ -1,13 +1,14 @@
 // src/pages/api/messages.ts
 import type { APIRoute } from "astro";
 import { PrismaClient } from "@prisma/client";
+import { sendEmail } from "../../lib/resend"; // Import the email function
 
 // This line is crucial for API routes that receive POST requests.
 export const prerender = false;
 
 const prisma = new PrismaClient();
 
-// This API endpoint now creates a new Conversation instead of a single Message.
+// This API endpoint now creates a new Conversation and sends an email notification.
 export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
@@ -34,21 +35,42 @@ export const POST: APIRoute = async ({ request }) => {
         contactName: `${name} ${lastname}`,
         contactEmail: email,
         phone,
-        // Create a subject from the first few words of the message
         subject: message.split(" ").slice(0, 8).join(" ") + "...",
         initialMessage: message,
-        status: "OPEN", // All new conversations start as 'OPEN'
+        status: "OPEN",
       },
     });
 
-    // --- TODO: Add email notification logic here ---
-    // You could send an email to your client to notify them of the new message.
-    // await resend.emails.send({
-    //   from: 'noreply@yourdomain.com',
-    //   to: 'client@email.com',
-    //   subject: `Nuevo mensaje de ${newConversation.contactName}`,
-    //   html: `<p>Has recibido un nuevo mensaje. <a href="/dashboard/mensajes/${newConversation.id}">Ver conversación</a></p>`,
-    // });
+    // --- Send Notification Email to Site Owner ---
+    try {
+      const siteOwnerEmail = import.meta.env.ADMIN_EMAIL; // Set this in your .env file
+      if (siteOwnerEmail) {
+        await sendEmail({
+          to: siteOwnerEmail,
+          subject: `Nuevo mensaje de: ${newConversation.contactName}`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; background-color: #f4f4f4;">
+              <h2 style="color: #333;">Has recibido un nuevo mensaje</h2>
+              <div style="background-color: #fff; padding: 20px; border-radius: 8px;">
+                <p><strong>De:</strong> ${newConversation.contactName}</p>
+                <p><strong>Email:</strong> ${newConversation.contactEmail}</p>
+                ${newConversation.phone ? `<p><strong>Teléfono:</strong> ${newConversation.phone}</p>` : ""}
+                <p><strong>Mensaje:</strong></p>
+                <p style="white-space: pre-wrap; border-left: 3px solid #ccc; padding-left: 15px;">${newConversation.initialMessage}</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                <a href="${new URL(`/admin/mensajes/${newConversation.id}`, request.url).href}" style="display: inline-block; padding: 12px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">
+                  Ver y Responder en el Dashboard
+                </a>
+              </div>
+            </div>
+          `,
+        });
+      }
+    } catch (emailError) {
+      // Log the email error but don't fail the entire request.
+      // The user's message is already saved.
+      console.error("Failed to send notification email:", emailError);
+    }
 
     return new Response(
       JSON.stringify({
