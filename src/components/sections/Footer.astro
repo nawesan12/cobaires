@@ -22,186 +22,194 @@ const logoImage = isHomePage ? "/logo-white.png" : "/logo-black.png";
 
 <footer
     class:list={[
-        "w-screen text-xl py-20 px-4 flex lg:grid lg:grid-cols-3 flex-col lg:items-center lg:justify-items-center justify-between gap-4 transition-colors duration-300",
+        "w-screen text-xl py-20 px-4 flex-col gap-4 transition-colors duration-300",
         footerBgClass,
         textColorClass,
     ]}
 >
-    <div class="logo">
-        <!-- The logo image will remain the same on all pages -->
-        <img src={logoImage} alt="Cobaires" class="h-6" />
-    </div>
-
-    <!-- This empty div is used for layout spacing in the 3-column grid -->
-    <div></div>
-
-    <div class="self-center grid lg:grid-cols-2">
-        <div class="links w-full">
-            <ul class="flex lg:flex-col gap-2 justify-evenly">
-                <li>
-                    <a
-                        href="/"
-                        class:list={[
-                            "hover:opacity-75 transition-opacity",
-                            {
-                                "underline underline-offset-4":
-                                    pathname === "/",
-                            },
-                        ]}>Inicio</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/nosotros"
-                        class:list={[
-                            "hover:opacity-75 transition-opacity",
-                            {
-                                "underline underline-offset-4":
-                                    pathname === "/nosotros",
-                            },
-                        ]}>Nosotros</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/proyectos"
-                        class:list={[
-                            "hover:opacity-75 transition-opacity",
-                            {
-                                "underline underline-offset-4":
-                                    pathname === "/proyectos",
-                            },
-                        ]}>Proyectos</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/servicios"
-                        class:list={[
-                            "hover:opacity-75 transition-opacity",
-                            {
-                                "underline underline-offset-4":
-                                    pathname === "/servicios",
-                            },
-                        ]}>Servicios</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/contacto"
-                        class:list={[
-                            "hover:opacity-75 transition-opacity",
-                            {
-                                "underline underline-offset-4":
-                                    pathname === "/contacto",
-                            },
-                        ]}>Contacto</a
-                    >
-                </li>
-            </ul>
+    <div
+        class="max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-3 lg:items-center gap-4"
+    >
+        <div class="logo">
+            <img src={logoImage} alt="Cobaires" class="h-6" />
         </div>
 
-        <div class="self-end">
-            <div
-                class="flex lg:flex-col items-center justify-end lg:items-end my-8 gap-4"
-            >
-                <div class="flex gap-4">
-                    <span
+        <!-- This empty div is used for layout spacing in the 3-column grid -->
+        <div></div>
+
+        <div class="grid lg:grid-cols-2">
+            <div class="links w-full">
+                <ul class="flex lg:flex-col gap-2 justify-evenly">
+                    <li>
+                        <a
+                            href="/"
+                            class:list={[
+                                "hover:opacity-75 transition-opacity",
+                                {
+                                    "underline underline-offset-4":
+                                        pathname === "/",
+                                },
+                            ]}>Inicio</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/nosotros"
+                            class:list={[
+                                "hover:opacity-75 transition-opacity",
+                                {
+                                    "underline underline-offset-4":
+                                        pathname === "/nosotros",
+                                },
+                            ]}>Nosotros</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/proyectos"
+                            class:list={[
+                                "hover:opacity-75 transition-opacity",
+                                {
+                                    "underline underline-offset-4":
+                                        pathname === "/proyectos",
+                                },
+                            ]}>Proyectos</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/servicios"
+                            class:list={[
+                                "hover:opacity-75 transition-opacity",
+                                {
+                                    "underline underline-offset-4":
+                                        pathname === "/servicios",
+                                },
+                            ]}>Servicios</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="/contacto"
+                            class:list={[
+                                "hover:opacity-75 transition-opacity",
+                                {
+                                    "underline underline-offset-4":
+                                        pathname === "/contacto",
+                                },
+                            ]}>Contacto</a
+                        >
+                    </li>
+                </ul>
+            </div>
+
+            <div class="self-end">
+                <div
+                    class="flex lg:flex-col items-center justify-end lg:items-end my-8 gap-4"
+                >
+                    <div class="flex gap-4">
+                        <span
+                            class:list={[
+                                "border rounded-full p-1",
+                                borderColorClass,
+                            ]}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-brand-instagram"
+                            >
+                                <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"></path>
+                                <path
+                                    d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"
+                                ></path>
+                                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                                ></path>
+                                <path d="M16.5 7.5v.01"></path>
+                            </svg>
+                        </span>
+                        <span
+                            class:list={[
+                                "border rounded-full p-1",
+                                borderColorClass,
+                            ]}
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"
+                            >
+                                <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"></path>
+                                <path d="M8 11v5"></path>
+                                <path d="M8 8v.01"></path>
+                                <path d="M12 16v-5"></path>
+                                <path d="M16 16v-3a2 2 0 1 0 -4 0"></path>
+                                <path
+                                    d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4z"
+                                ></path>
+                            </svg>
+                        </span>
+                    </div>
+                    <!-- The button's border class is also conditional -->
+                    <button
+                        id="scroll-up-button"
                         class:list={[
-                            "border rounded-full p-1",
+                            "flex items-center rounded-full p-4 border max-w-max",
                             borderColorClass,
                         ]}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="32"
-                            height="32"
+                            width="24"
+                            height="24"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             stroke-width="2"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-brand-instagram"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-up"
                         >
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"
                             ></path>
-                            <path
-                                d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"
-                            ></path>
-                            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
-                            <path d="M16.5 7.5v.01"></path>
+                            <path d="M6 15l6 -6l6 6"></path>
                         </svg>
-                    </span>
-                    <span
-                        class:list={[
-                            "border rounded-full p-1",
-                            borderColorClass,
-                        ]}
-                    >
-                        <svg
-                            width="32"
-                            height="32"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"
-                            ></path>
-                            <path d="M8 11v5"></path>
-                            <path d="M8 8v.01"></path>
-                            <path d="M12 16v-5"></path>
-                            <path d="M16 16v-3a2 2 0 1 0 -4 0"></path>
-                            <path
-                                d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4z"
-                            ></path>
-                        </svg>
-                    </span>
+                        Volver arriba
+                    </button>
                 </div>
-                <!-- The button's border class is also conditional -->
-                <button
-                    id="scroll-up-button"
-                    class:list={[
-                        "flex items-center rounded-full p-4 border max-w-max",
-                        borderColorClass,
-                    ]}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-up"
-                    >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"
-                        ></path>
-                        <path d="M6 15l6 -6l6 6"></path>
-                    </svg>
-                    Volver arriba
-                </button>
             </div>
         </div>
     </div>
-</footer>
 
-<script>
-    // Client-side script to handle the scroll-to-top functionality
-    const scrollUpButton = document.getElementById("scroll-up-button");
-    if (scrollUpButton) {
-        scrollUpButton.addEventListener("click", () => {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
+    <script>
+        // Client-side script to handle the scroll-to-top functionality
+        const scrollUpButton = document.getElementById("scroll-up-button");
+        if (scrollUpButton) {
+            scrollUpButton.addEventListener("click", () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
             });
-        });
-    }
-</script>
+        }
+    </script>
+</footer>
