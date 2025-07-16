@@ -1,4 +1,9 @@
 ---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/sections/Nosotros/Header.astro";
+---
+
+<!-- ---
 import Header from "../components/sections/Nosotros/Header.astro";
 import Layout from "../layouts/Layout.astro";
 ---
@@ -49,4 +54,157 @@ import Layout from "../layouts/Layout.astro";
             </h2>
         </div>
     </section>
+</Layout> -->
+<Layout>
+    <Header />
+
+    <section
+        class="max-w-7xl mx-auto items-center grid grid-cols-1 lg:grid-cols-2 justify-between gap-16 px-4 lg:px-0 py-12 lg:py-24"
+    >
+        <!-- Contact Form Column -->
+        <!-- The main div is now a <form> tag to handle submission -->
+        <form id="contact-form" class="flex flex-col w-full gap-8">
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg transition-colors focus:border-[#666695] focus:outline-none focus:ring-2 focus:ring-[#666695]/50"
+                placeholder="Nombre"
+                required
+            />
+            <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg transition-colors focus:border-[#666695] focus:outline-none focus:ring-2 focus:ring-[#666695]/50"
+                placeholder="Apellido"
+                required
+            />
+            <input
+                type="tel"
+                id="telefono"
+                name="telefono"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg transition-colors focus:border-[#666695] focus:outline-none focus:ring-2 focus:ring-[#666695]/50"
+                placeholder="Teléfono"
+                required
+            />
+            <input
+                type="email"
+                id="email"
+                name="email"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg transition-colors focus:border-[#666695] focus:outline-none focus:ring-2 focus:ring-[#666695]/50"
+                placeholder="E-mail"
+                required
+            />
+            <textarea
+                name="mensaje"
+                id="mensaje"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg transition-colors focus:border-[#666695] focus:outline-none focus:ring-2 focus:ring-[#666695]/50 h-32 resize-none"
+                placeholder="Mensaje..."
+                required></textarea>
+            <button
+                type="submit"
+                id="submit-button"
+                class="bg-[#666695] text-[#EFE8E6] p-2 rounded-lg w-full lg:w-1/2 text-lg transition-all duration-300 ease-in-out hover:bg-[#55557e] disabled:bg-[#3A411D] disabled:cursor-not-allowed"
+            >
+                Enviar
+            </button>
+        </form>
+
+        <!-- Text Column -->
+        <div class="flex items-start justify-center flex-col">
+            <h2 class="text-[#051314] font-semibold text-4xl">
+                Hablemos de tu próximo <br /> proyecto
+            </h2>
+            <img src="/contactp.png" alt="Contacto" class="w-full" />
+        </div>
+    </section>
 </Layout>
+
+<script>
+    // This script runs on the client to handle form interactions.
+    const contactForm = document.getElementById(
+        "contact-form",
+    ) as HTMLFormElement;
+    const submitButton = document.getElementById(
+        "submit-button",
+    ) as HTMLButtonElement;
+
+    // --- Form Validation ---
+    const validateForm = (): boolean => {
+        let isValid = true;
+        // Select all inputs and the textarea that have the 'required' attribute.
+        const requiredFields = contactForm.querySelectorAll<
+            HTMLInputElement | HTMLTextAreaElement
+        >("[required]");
+
+        requiredFields.forEach((field) => {
+            // Reset to original border color on each validation attempt.
+            field.classList.remove("border-red-500");
+            field.classList.add("border-[#051314]");
+
+            // Check if the field is empty.
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add("border-red-500");
+                field.classList.remove("border-[#051314]");
+            }
+
+            // Perform a specific format check for the email field.
+            if (field.type === "email") {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(field.value)) {
+                    isValid = false;
+                    field.classList.add("border-red-500");
+                    field.classList.remove("border-[#051314]");
+                }
+            }
+        });
+
+        return isValid;
+    };
+
+    // --- Placeholder Submission Function ---
+    // This function runs when the form is successfully validated.
+    const handleFormSubmit = () => {
+        console.log("Form submission successful. Data:");
+        const formData = new FormData(contactForm);
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
+        // --- UI Update on Success ---
+        // 1. Disable the button to prevent repeated submissions.
+        submitButton.disabled = true;
+
+        // 2. Change the button's text.
+        submitButton.innerHTML =
+            "¡Mensaje enviado correctamente!<br>Te responderemos a la brevedad.";
+
+        // 3. Make the button full-width by removing the responsive width class.
+        submitButton.classList.remove("lg:w-1/2");
+        submitButton.classList.add("w-full");
+
+        contactForm.reset();
+
+        // The background color change is handled by the `disabled:bg-green-500` class in the HTML.
+    };
+
+    // --- Event Listener ---
+    // Listen for the 'submit' event on the form.
+    contactForm.addEventListener("submit", (event: SubmitEvent) => {
+        // Prevent the browser's default action of reloading the page.
+        event.preventDefault();
+
+        // Run the validation function.
+        if (validateForm()) {
+            // If validation passes, call the submission handler.
+            handleFormSubmit();
+        } else {
+            // If validation fails, log a message to the console.
+            console.log(
+                "Form validation failed. Please fill out all required fields correctly.",
+            );
+        }
+    });
+</script>
