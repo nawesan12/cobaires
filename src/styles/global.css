@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+/* src/styles/global.css */
+@font-face {
+  font-family: "Matter";
+  src: url("/fonts/MatterThin.woff") format("woff");
+  font-weight: 100; /* Thin */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Matter";
+  src: url("/fonts/MatterRegular.woff") format("woff");
+  font-weight: 400; /* Regular / Normal */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Matter";
+  src: url("/fonts/MatterMedium.woff") format("woff");
+  font-weight: 500; /* Medium */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Matter";
+  src: url("/fonts/MatterSemiBold.woff") format("woff");
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Matter";
+  src: url("/fonts/MatterBold.woff") format("woff");
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}
+body {
+  font-family: "Matter", sans-serif;
+  font-weight: normal;
+}
