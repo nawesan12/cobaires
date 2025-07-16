@@ -1,0 +1,51 @@
+---
+// No props or logic needed for this component
+---
+
+<section
+    class="relative w-full bg-cover bg-top py-24 px-4 text-[#EFE8E6]"
+    style="background-image: url('/main-cta.jpg');"
+>
+    <!-- This div creates the dark, semi-transparent overlay over the background image -->
+    <div class="absolute inset-0 bg-[#051314] bg-opacity-60 opacity-60"></div>
+
+    <!--
+        This wrapper is positioned above the overlay (z-10).
+        It contains all your content and uses the same layout classes to ensure alignment.
+    -->
+    <div class="relative z-10 lg:max-w-7xl flex flex-col mx-auto gap-8">
+        <h3 class="font-medium text-5xl md:text-7xl">Hablemos</h3>
+
+        <div class="h-2 relative w-full bg-[#EFE8E6]">
+            <div
+                class="h-8 w-8 absolute right-0 top-1/2 -translate-y-1/2 bg-[#EFE8E6]"
+            >
+            </div>
+        </div>
+
+        <div class="self-end flex flex-col gap-8 text-right">
+            <h3 class="font-medium text-5xl md:text-7xl">
+                de tu <br /> próximo proyecto.
+            </h3>
+            <a
+                href="/contacto"
+                class="flex self-end text-sm items-center border gap-2 px-4 py-2 max-w-max rounded-full text-[#EFE8E6] border-[#EFE8E6] hover:bg-[#EFE8E6] hover:text-[#051314] transition-colors"
+            >
+                <span>Contactanos</span>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path stroke="none" d="M0 0h24v24H0z" fill="none"
+                    ></path><path d="M9 6l6 6l-6 6"></path>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,106 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Footer from "../components/sections/Footer.astro";
+import Header from "../components/sections/Nosotros/Header.astro";
+
+export function getStaticPaths() {
+    return [
+        { params: { proyecto: "1" } },
+        { params: { proyecto: "2" } },
+        { params: { proyecto: "3" } },
+    ];
+}
+
+const { proyecto } = Astro.params;
+---
+
+<Layout>
+    <Header />
+
+    <section
+        class="px-4 lg:px-0 lg:max-w-7xl w-full mx-auto flex flex-col gap-11"
+    >
+        <div>
+            <img
+                src="/carrusel1.png"
+                class="h-[600px] w-full rounded-4xl object-cover"
+                alt="Cobaires"
+            />
+        </div>
+
+        <div
+            class="px-4 lg:px-0 lg:max-w-4xl mx-auto flex flex-col w-full gap-11"
+        >
+            <h2 class="font-medium text-3xl text-[#051314]">
+                Vivienda unifamiliar en Grand Bell
+            </h2>
+
+            <p>
+                Esta vivienda responde a una premisa muy clara y definitoria
+                establecida por el cliente, la localización del estar-comedor
+                debía estar en la plata superior. Eso le permitiría gozar de las
+                vistas circundantes, apreciar las copas de los árboles, y
+                conseguir una mayor extensión del horizonte.
+                <br />
+                <br />
+                Se dio prioridad a un emplazamiento de carácter volumétrico que estableció
+                vínculos de equilibrio y claridad con el entorno, dividiendo la casa
+                en dos cuerpos. La casa se define por la superposición de dos tipos
+                de vida: una introvertida, en la que prevalecen el aislamiento y
+                las actividades privadas y otra extrovertida y contemplativa del
+                paisaje, las que se articular mediante un vacío que contiene el hall
+                y la escalera.
+                <br />
+                <br />
+                En cuanto a la materialidad, solo brillan los colores propios de
+                los materiales: hormigón visto, piedra pórfido y revoque plástico
+                blanco.
+            </p>
+
+            <ul class="flex flex-col gap-4 mb-20">
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]"
+                        >Proyecto</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">
+                        Vivienda en Grand Bell
+                    </p>
+                </li>
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]"
+                        >Tipo</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">
+                        Proyección y dirección
+                    </p>
+                </li>
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]"
+                        >Locación</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">
+                        Club de campo Grand Bell, City Bell, La Plata, Buenos
+                        Aires, Argentina
+                    </p>
+                </li>
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]">Año</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">2011-2012</p>
+                </li>
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]"
+                        >Superficie</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">266 m2</p>
+                </li>
+                <li class="border-b border-black grid grid-cols-2">
+                    <span class="text-lg font-semibold text-[#051314]"
+                        >Cliente</span
+                    >
+                    <p class="text-lg font-light text-[#051314]">Privado</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+</Layout>

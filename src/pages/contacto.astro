@@ -1,0 +1,52 @@
+---
+import Header from "../components/sections/Nosotros/Header.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+    <Header />
+
+    <section
+        class="max-w-7xl mx-auto items-center grid grid-cols-1 lg:grid-cols-2 justify-between px-4 lg:px-0 py-4"
+    >
+        <div class="flex flex-col w-full gap-8">
+            <input
+                type="text"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg"
+                placeholder="Nombre"
+            />
+            <input
+                type="text"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg"
+                placeholder="Apellido"
+            />
+            <input
+                type="text"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg"
+                placeholder="Telefono"
+            />
+            <input
+                type="text"
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg"
+                placeholder="E-mail"
+            />
+
+            <textarea
+                name=""
+                class="border w-full rounded-lg border-[#051314] px-4 py-2 text-lg"
+                placeholder="Mensaje..."
+                id=""></textarea>
+
+            <button
+                class="bg-[#666695] text-[#EFE8E6] p-2 rounded-lg w-full lg:w-1/2 text-lg"
+                >Enviar</button
+            >
+        </div>
+
+        <div class="flex items-center justify-center flex-col">
+            <h2 class="text-[#051314] font-semibold text-3xl">
+                Hablemos de tu próximo <br /> proyecto
+            </h2>
+        </div>
+    </section>
+</Layout>

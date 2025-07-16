@@ -1,5 +1,10 @@
+---
+import Footer from "../components/sections/Footer.astro";
+import "../styles/global.css";
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
@@ -7,8 +12,9 @@
         <meta name="generator" content={Astro.generator} />
         <title>Cobaires</title>
     </head>
-    <body>
+    <body class="bg-[#EFE8E6]">
         <slot />
+        <Footer />
     </body>
 </html>
 

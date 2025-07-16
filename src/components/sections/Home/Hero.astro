@@ -1,0 +1,137 @@
+---
+// Assuming the Header component is in a relative path
+import Header from "../../Header.astro";
+---
+
+<section
+    class="relative min-h-screen flex flex-col w-full bg-cover bg-top text-white bg-[url('/main-hero.jpg')]"
+    style="background-image: url('/main-hero.jpg');"
+>
+    <!-- This div creates the dark, semi-transparent overlay over the background image -->
+    <div class="absolute inset-0 bg-[#051314] bg-opacity-60 opacity-60"></div>
+
+    <!--jjj
+        This wrapper is positioned above the overlay (z-10).
+        It's a flex column that takes up the full height (flex-grow).
+        It also acts as the main container to center and constrain the width of the content,
+        ensuring the Header and the text below are perfectly aligned.
+    -->
+    <div
+        class="relative z-10 flex flex-col flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+    >
+        <!-- The Header component is placed here -->
+        <Header />
+
+        <!--
+            This div grows to fill the available space, pushing the content
+            (title and nav) to the bottom of the screen.
+        -->
+        <div class="flex-grow flex flex-col justify-end">
+            <!-- Container for the title and navigation links -->
+            <div class="pb-20 flex flex-col gap-11">
+                <h2
+                    class="text-5xl md:text-7xl lg:text-8xl font-medium text-[#EFE8E6]"
+                >
+                    Cada diseño, <br /> una obra con propósito
+                </h2>
+                <nav
+                    class="hidden md:flex lg:flex items-center justify-between"
+                >
+                    <ul
+                        class="flex flex-wrap gap-x-8 gap-y-4 text-[#EFE8E6] text-xl items-center"
+                    >
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:underline transition-colors"
+                                >Inicio</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:underline transition-colors"
+                                >Nosotros</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:underline transition-colors"
+                                >Servicios</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:underline transition-colors"
+                                >Proyectos</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:underline transition-colors"
+                                >Contacto</a
+                            >
+                        </li>
+                    </ul>
+
+                    <div class="flex justify-end gap-4 my-8">
+                        <!-- The border class for the social icons is now conditional -->
+                        <span class:list={["border rounded-full p-1"]}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-brand-instagram"
+                            >
+                                <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"></path>
+                                <path
+                                    d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"
+                                ></path>
+                                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"
+                                ></path>
+                                <path d="M16.5 7.5v.01"></path>
+                            </svg>
+                        </span>
+                        <span class:list={["border rounded-full p-1"]}>
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"
+                            >
+                                <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"></path>
+                                <path d="M8 11v5"></path>
+                                <path d="M8 8v.01"></path>
+                                <path d="M12 16v-5"></path>
+                                <path d="M16 16v-3a2 2 0 1 0 -4 0"></path>
+                                <path
+                                    d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4z"
+                                ></path>
+                            </svg>
+                        </span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,75 @@
+---
+import Header from "../components/sections/Nosotros/Header.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+    <Header />
+
+    <section
+        class="grid grid-cols-1 lg:grid-cols-3 mx-auto gap-8 px-4 py-11 lg:max-w-7xl"
+    >
+        <div class="flex flex-col items-center gap-4">
+            <img src="/mision.png" class="size-32" alt="" />
+            <h2 class="font-semibold text-3xl">Misión</h2>
+            <p class="text-center text-xl">
+                Diseñar y construir soluciones arquitectónicas y constructivas
+                que trasciendan, combinando calidad, atención personalizada y
+                compromiso en cada proyecto.
+            </p>
+        </div>
+        <div class="flex flex-col items-center gap-4">
+            <img src="/vision.png" class="size-32" alt="" />
+            <h2 class="font-semibold text-3xl">Visión</h2>
+            <p class="text-center text-xl">
+                Ser líderes en el sector de la construcción, reconocidos por
+                nuestra innovación, confiabilidad y enfoque en el diseño
+                sostenible
+            </p>
+        </div>
+        <div class="flex flex-col items-center gap-4">
+            <img src="/valores.png" class="size-32" alt="" />
+            <h2 class="font-semibold text-3xl">Valores</h2>
+            <p class="text-center text-xl">
+                <b>Trabajo en equipo:</b> las personas son el motor de cada proyecto.
+                <br />
+                <b>Compromiso con la calidad:</b> cada detalle refleja nuestra dedicación.
+                <br />
+                <b>Sostenibilidad:</b> construimos pensando en el futuro.
+            </p>
+        </div>
+    </section>
+
+    <section
+        class="grid grid-cols-1 lg:grid-cols-2 mx-auto gap-8 px-4 py-11 lg:max-w-7xl"
+    >
+        <div class="flex flex-col items-center gap-4">
+            <div class="bg-[#051314] rounded-3xl">
+                <img src="/francisco.png" class="size-80 rounded-3xl" alt="" />
+            </div>
+            <h2 class="font-semibold text-3xl">Francisco Petraglia</h2>
+            <p class="text-xl lg:max-w-md">
+                Lorem ipsum dolor sit amet consectetur. Nam vitae consequat non
+                arcu massa felis ac lectus. <br />
+                <br /> Nam amet aenean blandit quisque. Volutpat volutpat tempus
+                nibh nam hendrerit massa faucibus. <br />
+                <br /> Ornare etiam enim sed commodo ipsum in. Nam amet aenean blandit
+                quisque. Volutpat volutpat tempus nibh nam .
+            </p>
+        </div>
+        <div class="flex flex-col items-center gap-4">
+            <div class="bg-[#051314] rounded-3xl">
+                <img src="/jorge.png" class="size-80 rounded-3xl" alt="" />
+            </div>
+            <h2 class="font-semibold text-3xl">Jorge Sánchez</h2>
+            <p class="text-xl lg:max-w-md">
+                Lorem ipsum dolor sit amet consectetur. Nam vitae consequat non
+                arcu massa felis ac lectus. <br />
+                <br /> Nam amet aenean blandit quisque. Volutpat volutpat tempus
+                nibh nam hendrerit massa faucibus. <br />
+                <br /> Ornare etiam enim sed commodo ipsum in. Nam amet aenean blandit
+                quisque. Volutpat volutpat tempus nibh nam .
+            </p>
+        </div>
+    </section>
+</Layout>
