@@ -1,7 +1,8 @@
 ---
 // src/pages/proyectos/[id].astro
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/sections/Nosotros/Header.astro";
+import Header from "../components/Header.astro";
+import SecondHeader from "../components/SecondHeader.astro";
 import { PrismaClient } from "@prisma/client";
 
 // --- FIX: This line switches the page from static (SSG) to dynamic (SSR) ---
@@ -33,7 +34,14 @@ const imageUrls = project.images.map((img) => img.url);
 ---
 
 <Layout>
-    <Header />
+    <div class="block lg:hidden">
+       <Header />
+     </div>
+
+     <!-- Show SecondHeader on desktop -->
+     <div class="hidden lg:block">
+       <SecondHeader />
+     </div>
 
     <section
         class="px-4 md:px-4 lg:px-0 lg:max-w-7xl w-full mx-auto flex flex-col gap-11 py-12"

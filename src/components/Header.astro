@@ -1,161 +1,171 @@
-<header class="w-full py-11 px-4 lg:px-0 lg:py-20 z-50">
-    <!-- Main Header Bar -->
-    <div
-        class="lg:max-w-7xl w-full mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-0 py-4"
-    >
-        <!-- Logo -->
-        <div class="items-center hidden md:flex lg:flex">
-            <a
-                href="/"
-                class="text-2xl font-bold text-gray-800 hidden md:block lg:block hover:text-indigo-600 transition-colors"
-            >
-                <img src="/iso-white.png" alt="" />
-            </a>
-        </div>
+---
+// Get the current URL's pathname from the Astro global object.
+const { pathname } = Astro.url;
 
-        <!-- Desktop Navigation -->
-        <div class="items-center hidden md:flex lg:flex">
-            <a
-                href="/"
-                class="text-2xl font-bold text-gray-800 hidden md:block lg:block hover:text-indigo-600 transition-colors"
-            >
-                <img src="/logo-white.png" alt="" />
-            </a>
-        </div>
+// Determine if the current page is the homepage.
+const isHomePage = pathname === "/";
 
-        <div class="flex items-center md:hidden lg:hidden">
-            <a
-                href="/"
-                class="text-2xl font-bold text-gray-800 block md:hidden lg:hidden hover:text-indigo-600 transition-colors"
-            >
-                <img src="/cobaires.png" alt="" class="h-10" />
-            </a>
-        </div>
+// --- Conditional Styles & Attributes ---
+// Based on whether it's the homepage, we define the styles and image sources.
+// This keeps the HTML template below much cleaner.
 
-        <!-- Mobile Menu Button (Hamburger) -->
-        <div class="md:hidden">
-            <button
-                id="mobile-menu-open-button"
-                class="text-gray-800 hover:text-indigo-600 focus:outline-none"
-            >
-                <span class="sr-only">Open main menu</span>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#fff"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2"
-                    ><path stroke="none" d="M0 0h24v24H0z" fill="none"
-                    ></path><path d="M4 6l16 0"></path><path d="M4 12l16 0"
-                    ></path><path d="M4 18l16 0"></path></svg
-                >
-            </button>
-        </div>
+const headerClasses = isHomePage
+  ? "py-11 lg:py-20" // Default padding for transparent header
+  : "py-4"; // White bg and less padding for other pages
+
+const isoLogoSrc = isHomePage ? "/iso-white.svg" : "/iso-black.svg";
+const mainLogoSrc = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
+const mobileLogoSrc = isHomePage ? "/cobaires-white.svg" : "/cobaires-black.svg";
+const hamburgerStrokeColor = isHomePage ? "#fff" : "#1f2937"; // white or gray-800
+---
+
+<header
+  id="main-header"
+  class:list={[
+    "w-full z-50 transition-colors duration-300 ease-in-out",
+    headerClasses,
+  ]}
+>
+  <!-- Main Header Bar -->
+  <div
+    class="lg:max-w-7xl w-full mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-0 py-4"
+  >
+    <!-- Logo -->
+    <div class="items-center hidden md:flex lg:flex">
+      <a
+        href="/"
+        class="text-2xl font-bold text-gray-800 hidden md:block lg:block hover:text-indigo-600 transition-colors"
+      >
+        <img src={isoLogoSrc} alt="isologo" />
+      </a>
     </div>
 
-    <!--
-    Fullscreen Mobile Menu Overlay
-    - `fixed inset-0`: Makes it cover the entire screen.
-    - `bg-white/95 backdrop-blur-sm`: A slightly transparent white background with a blur effect.
-    - `z-40`: Positions it just below the main header bar (z-50).
-    - `flex items-center justify-center`: Centers the navigation links vertically and horizontally.
-    - `transform transition-transform...`: Handles the animation.
-    - `translate-x-full`: Hides the menu off-screen to the right by default.
-    - `data-open="false"`: A data attribute to track the state, initially closed.
-  -->
-    <div
-        id="mobile-menu-overlay"
-        class="fixed inset-0 bg-white/95 backdrop-blur-sm z-40 flex items-center justify-center transform transition-transform duration-300 ease-in-out translate-x-full"
-        data-open="false"
-    >
-        <!-- Close Button (X) -->
-        <button
-            id="mobile-menu-close-button"
-            class="absolute top-6 right-5 sm:right-7 text-gray-800 hover:text-indigo-600 focus:outline-none"
-        >
-            <span class="sr-only">Close menu</span>
-            <svg
-                class="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-
-        <!-- Mobile Navigation Links -->
-        <nav class="flex flex-col items-center space-y-8">
-            <a
-                href="#"
-                class="text-3xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
-                >Inicio</a
-            >
-            <a
-                href="#"
-                class="text-3xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
-                >Nosotros</a
-            >
-            <a
-                href="#"
-                class="text-3xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
-                >Proyectos</a
-            >
-            <a
-                href="#"
-                class="text-3xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
-                >Servicios</a
-            >
-            <a
-                href="#"
-                class="text-3xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
-                >Contacto</a
-            >
-        </nav>
+    <!-- Desktop Navigation -->
+    <div class="items-center hidden md:flex lg:flex">
+      <a
+        href="/"
+        class="text-2xl font-bold text-gray-800 hidden md:block lg:block hover:text-indigo-600 transition-colors"
+      >
+        <img src={mainLogoSrc} alt="logo" />
+      </a>
     </div>
+
+    <div class="flex items-center md:hidden lg:hidden">
+      <a
+        href="/"
+        class="text-2xl font-bold text-gray-800 block md:hidden lg:hidden hover:text-indigo-600 transition-colors"
+      >
+        <img src={mobileLogoSrc} alt="cobaires logo" class="h-10" />
+      </a>
+    </div>
+
+    <!-- Mobile Menu Button (Hamburger) -->
+    <div class="md:hidden">
+      <button
+        id="mobile-menu-open-button"
+        class="text-gray-800 hover:text-indigo-600 focus:outline-none"
+      >
+        <span class="sr-only">Open main menu</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={hamburgerStrokeColor}
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon icon-tabler icons-tabler-outline icon-tabler-menu-2"
+          ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+            d="M4 6l16 0"></path><path d="M4 12l16 0"></path><path
+            d="M4 18l16 0"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Mobile Menu Overlay -->
+  <div
+    id="mobile-menu-overlay"
+    class="fixed inset-0 bg-white/95 backdrop-blur-sm z-40 flex items-center justify-center transform transition-transform duration-300 ease-in-out translate-x-full"
+    data-open="false"
+  >
+    <!-- Close Button (X) -->
+    <button
+      id="mobile-menu-close-button"
+      class="absolute top-6 right-5 sm:right-7 text-gray-800 hover:text-indigo-600 focus:outline-none"
+    >
+      <span class="sr-only">Close menu</span>
+      <svg
+        class="h-8 w-8"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <!-- Mobile Navigation Links -->
+    <nav class="flex flex-col items-start space-y-8">
+      <a
+        href="/"
+        class="text-4xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
+        >Inicio</a
+      >
+      <a
+        href="/nosotros"
+        class="text-4xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
+        >Nosotros</a
+      >
+      <a
+        href="/proyectos"
+        class="text-4xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
+        >Proyectos</a
+      >
+      <a
+        href="/servicios"
+        class="text-4xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
+        >Servicios</a
+      >
+      <a
+        href="/contacto"
+        class="text-4xl text-gray-800 hover:text-indigo-600 font-medium transition-colors"
+        >Contacto</a
+      >
+    </nav>
+  </div>
 </header>
 
 <script>
-    // This script runs on the client to handle menu interactions.
-    const openButton = document.getElementById("mobile-menu-open-button");
-    const closeButton = document.getElementById("mobile-menu-close-button");
-    const overlay = document.getElementById("mobile-menu-overlay");
+  // This client-side script ONLY handles the mobile menu interaction.
+  // All color and style changes are now handled by Astro on the server.
+  const openButton = document.getElementById("mobile-menu-open-button");
+  const closeButton = document.getElementById("mobile-menu-close-button");
+  const overlay = document.getElementById("mobile-menu-overlay");
 
-    // Function to open the menu
-    const openMenu = () => {
-        if (overlay) {
-            // Move the overlay into view
-            overlay.classList.remove("translate-x-full");
-            // Prevent scrolling of the background content
-            document.body.classList.add("overflow-hidden");
-        }
-    };
+  const openMenu = () => {
+    if (overlay) {
+      overlay.classList.remove("translate-x-full");
+      document.body.classList.add("overflow-hidden");
+    }
+  };
 
-    // Function to close the menu
-    const closeMenu = () => {
-        if (overlay) {
-            // Move the overlay out of view
-            overlay.classList.add("translate-x-full");
-            // Restore scrolling of the background content
-            document.body.classList.remove("overflow-hidden");
-        }
-    };
+  const closeMenu = () => {
+    if (overlay) {
+      overlay.classList.add("translate-x-full");
+      document.body.classList.remove("overflow-hidden");
+    }
+  };
 
-    // Event Listeners
-    openButton?.addEventListener("click", openMenu);
-    closeButton?.addEventListener("click", closeMenu);
-
-    // Optional: Close menu when a link is clicked
-    overlay?.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", closeMenu);
-    });
+  openButton?.addEventListener("click", openMenu);
+  closeButton?.addEventListener("click", closeMenu);
+  overlay?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
 </script>

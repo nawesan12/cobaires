@@ -1,10 +1,18 @@
 ---
-import Header from "../components/sections/Nosotros/Header.astro";
+import Header from "../components/Header.astro";
+import SecondHeader from "../components/SecondHeader.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-    <Header />
+    <div class="block lg:hidden">
+       <Header />
+     </div>
+
+     <!-- Show SecondHeader on desktop -->
+     <div class="hidden lg:block">
+       <SecondHeader />
+     </div>
 
     <section
         class="max-w-7xl lg:px-0 px-4 mx-auto grid gap-8 md:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"

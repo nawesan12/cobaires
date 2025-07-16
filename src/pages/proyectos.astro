@@ -1,7 +1,8 @@
 ---
 // src/pages/proyectos/index.astro
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/sections/Nosotros/Header.astro"; // Assuming this is the correct header
+import Header from "../components/Header.astro"; // Assuming this is the correct header
+import SecondHeader from "../components/SecondHeader.astro";
 import { PrismaClient } from "@prisma/client";
 
 export const prerender = false
@@ -23,7 +24,14 @@ const projects = await prisma.project.findMany({
 ---
 
 <Layout>
-    <Header />
+    <div class="block lg:hidden">
+       <Header />
+     </div>
+
+     <!-- Show SecondHeader on desktop -->
+     <div class="hidden lg:block">
+       <SecondHeader />
+     </div>
 
     <section class="px-4 lg:px-0 py-12">
         <header class="lg:max-w-7xl mx-auto space-y-4 mb-12">
