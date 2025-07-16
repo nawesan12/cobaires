@@ -16,7 +16,7 @@ const conversations = await prisma.conversation.findMany({
 ---
 
 <Layout title="Dashboard - Mensajes">
-    <main class="bg-gray-50 min-h-screen p-4 sm:p-6 lg:p-8">
+    <main class="min-h-screen p-4 sm:p-6 lg:p-8">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10">
                 <h1 class="text-4xl font-bold text-gray-800">
@@ -34,7 +34,7 @@ const conversations = await prisma.conversation.findMany({
                             conversations.map((conversation) => (
                                 <li>
                                     <a
-                                        href={`/dashboard/mensajes/${conversation.id}`}
+                                        href={`/admin/mensajes/${conversation.id}`}
                                         class="block p-6 hover:bg-gray-50 transition-colors"
                                     >
                                         <div class="flex justify-between items-start">
@@ -42,7 +42,7 @@ const conversations = await prisma.conversation.findMany({
                                                 {conversation.status ===
                                                     "OPEN" && (
                                                     <span
-                                                        class="h-2.5 w-2.5 bg-blue-500 rounded-full flex-shrink-0"
+                                                        class="h-2.5 w-2.5 bg-[#666695] rounded-full flex-shrink-0"
                                                         title="Conversación abierta"
                                                     />
                                                 )}
