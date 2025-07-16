@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/vercel": "^8.2.2",
     "@hubspot/api-client": "^13.0.0",
     "@lucide/astro": "^0.523.0",
     "@prisma/client": "^6.12.0",
