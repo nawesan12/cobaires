@@ -28,9 +28,9 @@ const logoImage = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
     ]}
 >
     <div
-        class="max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-3 lg:items-center gap-4"
+        class="max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-3 lg:items-center lg:gap-4 gap-6"
     >
-        <div class="logo">
+        <div class="logo px-4 lg:px-0">
             <img src={logoImage} alt="Cobaires" class="h-6" />
         </div>
 
@@ -39,7 +39,7 @@ const logoImage = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
 
         <div class="grid lg:grid-cols-2">
             <div class="links w-full">
-                <ul class="flex lg:flex-col flex-wrap gap-2 justify-evenly">
+                <ul class="flex lg:flex-col text-sm lg:text-base flex-wrap gap-2 justify-evenly">
                     <li>
                         <a
                             href="/"
@@ -116,8 +116,8 @@ const logoImage = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                width="32"
-                                height="32"
+                                width="24"
+                                height="24"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -145,8 +145,8 @@ const logoImage = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
                             ]}
                         >
                             <svg
-                                width="32"
-                                height="32"
+                                width="24"
+                                height="24"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -173,14 +173,14 @@ const logoImage = isHomePage ? "/logo-white.svg" : "/logo-black.svg";
                     <button
                         id="scroll-up-button"
                         class:list={[
-                            "flex items-center text-sm rounded-full px-4 py-2 border max-w-max",
+                            "flex items-center text-xs lg:text-sm rounded-full px-4 py-2 border max-w-max",
                             borderColorClass,
                         ]}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
