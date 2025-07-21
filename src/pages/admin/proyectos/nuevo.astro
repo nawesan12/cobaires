@@ -179,7 +179,7 @@ import Layout from "../../../layouts/Layout.astro"; // Adjust path if needed
             <button
               type="submit"
               id="submit-button"
-              class="inline-flex items-center justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-[#666695] hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition disabled:bg-gray-400"
+              class="inline-flex items-center justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-[#666695] hover:brightness-90 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-400"
             >
               <span id="button-text">Crear Proyecto</span>
               <svg
@@ -210,47 +210,53 @@ import Layout from "../../../layouts/Layout.astro"; // Adjust path if needed
 </Layout>
 
 <script>
+  // Get DOM elements
   const form = document.getElementById("project-form");
   const submitButton = document.getElementById("submit-button");
   const buttonText = document.getElementById("button-text");
   const buttonSpinner = document.getElementById("button-spinner");
   const statusMessage = document.getElementById("status-message");
-
   const imageDropZone = document.getElementById("image-drop-zone");
   const imageUpload = document.getElementById("image-upload");
   const uploadPrompt = document.getElementById("upload-prompt");
   const previewsContainer = document.getElementById("previews-container");
 
-  //eslint-disable-next-line
-  const handleFiles = (files: any) => {
-    if (!files || files.length === 0) return;
+  // This variable will hold the files to be uploaded.
+  let filesToUpload = null;
 
-    uploadPrompt?.classList.add("hidden");
-    previewsContainer?.classList.remove("hidden");
-    //@ts-expect-error bla
-    previewsContainer?.innerHTML = ""; // Clear existing previews
+  // This function handles displaying file previews
+  const handleFiles = (files) => {
+    if (!files || files.length === 0) {
+      filesToUpload = null;
+      if (uploadPrompt) uploadPrompt.classList.remove("hidden");
+      if (previewsContainer) previewsContainer.classList.add("hidden");
+      return;
+    }
+
+    // Store the files for later submission
+    filesToUpload = files;
+
+    if (uploadPrompt) uploadPrompt.classList.add("hidden");
+    if (previewsContainer) {
+      previewsContainer.classList.remove("hidden");
+      previewsContainer.innerHTML = ""; // Clear existing previews
+    }
 
     Array.from(files).forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        // Create a wrapper for the image and radio button
         const previewWrapper = document.createElement("div");
         previewWrapper.className = "relative w-full h-32";
 
-        // Create the image preview
         const img = document.createElement("img");
-
-        img.src = e?.target?.result as string;
+        img.src = e.target?.result;
         img.className = "w-full h-full object-cover rounded-md";
 
-        // Create the radio button to select the thumbnail
         const radio = document.createElement("input");
         radio.type = "radio";
         radio.name = "thumbnail";
-        radio.value = index.toString(); // Use the file index as the value
+        radio.value = index.toString();
         radio.className = "absolute top-2 right-2 h-5 w-5 cursor-pointer";
-
-        // Make the first image the default thumbnail
         if (index === 0) {
           radio.checked = true;
         }
@@ -259,11 +265,11 @@ import Layout from "../../../layouts/Layout.astro"; // Adjust path if needed
         previewWrapper.appendChild(radio);
         previewsContainer?.appendChild(previewWrapper);
       };
-      //eslint-disable-next-line
-      reader.readAsDataURL(file as any);
+      reader.readAsDataURL(file);
     });
   };
 
+  // Event Listeners for Drag and Drop
   imageDropZone?.addEventListener("dragover", (e) => {
     e.preventDefault();
     imageDropZone?.classList.add("border-blue-500", "bg-blue-50");
@@ -276,31 +282,42 @@ import Layout from "../../../layouts/Layout.astro"; // Adjust path if needed
   imageDropZone?.addEventListener("drop", (e) => {
     e.preventDefault();
     imageDropZone?.classList.remove("border-blue-500", "bg-blue-50");
-    if (e.dataTransfer?.files?.length) {
-      //@ts-expect-error bla
-      imageUpload.files = e.dataTransfer.files;
+    if (e.dataTransfer?.files.length) {
+      // This is the correct way: Call handleFiles with the dropped files.
+      // Do not try to assign to imageUpload.files
       handleFiles(e.dataTransfer.files);
     }
   });
 
-  imageUpload?.addEventListener("change", () => {
-    //@ts-expect-error bla
-    if (imageUpload.files?.length) {
-      //@ts-expect-error bla
-      handleFiles(imageUpload.files);
+  // Event Listener for File Input Change
+  imageUpload?.addEventListener("change", (e) => {
+    const target = e.target;
+    if (target.files?.length) {
+      handleFiles(target.files);
     }
   });
 
+  // Form Submission Logic
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    //@ts-expect-error bla
-    submitButton?.disabled = true;//@ts-expect-error bla
-    buttonText?.textContent = "Creando...";
-    buttonSpinner?.classList.remove("hidden");//@ts-expect-error bla
-    statusMessage?.textContent = "";//@ts-expect-error bla
-    statusMessage?.className = "mt-6 text-center font-medium";
-//@ts-expect-error bla
+    if (!submitButton || !buttonText || !buttonSpinner || !statusMessage) return;
+
+    submitButton.disabled = true;
+    buttonText.textContent = "Creando...";
+    buttonSpinner.classList.remove("hidden");
+    statusMessage.textContent = "";
+    statusMessage.className = "mt-6 text-center font-medium";
+
     const formData = new FormData(form);
+
+    // We must manually handle the files because the file input might be empty
+    // if the user used drag-and-drop.
+    formData.delete('images'); // Remove the default (potentially empty) file input
+    if (filesToUpload) {
+        for (let i = 0; i < filesToUpload.length; i++) {
+            formData.append("images", filesToUpload[i]);
+        }
+    }
 
     try {
       const response = await fetch("/api/projects", {
@@ -312,27 +329,23 @@ import Layout from "../../../layouts/Layout.astro"; // Adjust path if needed
       if (!response.ok) {
         throw new Error(result.message || "Algo salió mal.");
       }
-      //@ts-expect-error bla
-      statusMessage.textContent = "¡Proyecto creado con éxito!";//@ts-expect-error bla
-      statusMessage.classList.add("text-green-600");//@ts-expect-error bla
-      form.reset();//@ts-expect-error bla
-      uploadPrompt.classList.remove("hidden");//@ts-expect-error bla
-      previewsContainer.classList.add("hidden");//@ts-expect-error bla
-      previewsContainer.innerHTML = "";
 
-      // Redirect after a short delay to show the success message
+      statusMessage.textContent = "¡Proyecto creado con éxito!";
+      statusMessage.classList.add("text-green-600");
+      form.reset();
+      handleFiles(null); // Clear previews and stored files
+
       setTimeout(() => {
         window.location.href = `/dashboard/proyectos`;
       }, 1500);
 
-    } catch (error) {//@ts-expect-error bla
-      statusMessage.textContent = error.message;//@ts-expect-error bla
+    } catch (error) {
+      statusMessage.textContent = error.message;
       statusMessage.classList.add("text-red-600");
     } finally {
-      //@ts-expect-error bla
-      if (statusMessage.classList.contains('text-red-600')) {//@ts-expect-error bla
-        submitButton.disabled = false;//@ts-expect-error bla
-        buttonText.textContent = "Crear Proyecto";//@ts-expect-error bla
+      if (statusMessage.classList.contains('text-red-600')) {
+        submitButton.disabled = false;
+        buttonText.textContent = "Crear Proyecto";
         buttonSpinner.classList.add("hidden");
       }
     }
