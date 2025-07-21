@@ -5,7 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 export const prerender = false;
 
-// Configure Cloudinary with your credentials from the .env file
+// Configure Cloudinary
 cloudinary.config({
   cloud_name: import.meta.env.CLOUDINARY_CLOUD_NAME,
   api_key: import.meta.env.CLOUDINARY_API_KEY,
@@ -15,15 +15,14 @@ cloudinary.config({
 
 const prisma = new PrismaClient();
 
-// --- Helper function to extract public_id from a Cloudinary URL ---
+// Helper to get Cloudinary public_id from a URL
 const getPublicIdFromUrl = (url: string) => {
   const parts = url.split("/");
-  const filename = parts.pop();
-  const publicIdWithFolder = `cobaires_projects/${filename?.split(".")[0]}`;
-  return publicIdWithFolder;
+  const filename = parts.pop()?.split(".")[0];
+  return `cobaires_projects/${filename}`;
 };
 
-// --- API endpoint for UPDATING a project ---
+// API endpoint for UPDATING a project
 export const PUT: APIRoute = async ({ params, request }) => {
   const projectId = Number(params.id);
   if (isNaN(projectId)) {
@@ -36,7 +35,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
   try {
     const formData = await request.formData();
 
-    // --- Get all form data ---
+    // Get all form data
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const type = formData.get("type") as string | null;
@@ -49,23 +48,20 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const imagesToDelete: number[] = imagesToDeleteRaw
       ? JSON.parse(imagesToDeleteRaw)
       : [];
+    const thumbnailId = formData.get("thumbnail") as string;
 
-    // --- 1. Handle Deletion of Existing Images ---
+    // 1. Handle Deletion of Existing Images from Cloudinary
     if (imagesToDelete.length > 0) {
       const images = await prisma.projectImage.findMany({
         where: { id: { in: imagesToDelete } },
       });
-
-      // Delete from Cloudinary
-      const cloudinaryDeletePromises = images.map((img: any) =>
+      const cloudinaryDeletePromises = images.map((img) =>
         cloudinary.uploader.destroy(getPublicIdFromUrl(img.url)),
       );
       await Promise.all(cloudinaryDeletePromises);
-
-      // Delete from Database (this will happen inside the transaction)
     }
 
-    // --- 2. Handle Upload of New Images ---
+    // 2. Handle Upload of New Images to Cloudinary
     let newImageUrls: string[] = [];
     if (newImageFiles.length > 0 && newImageFiles[0].size > 0) {
       const uploadPromises = newImageFiles.map(
@@ -83,8 +79,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
       newImageUrls = await Promise.all(uploadPromises);
     }
 
-    // --- 3. Update Database in a Single, Safe Transaction ---
-    await prisma.$transaction(async (tx: any) => {
+    // 3. Update Database in a Single, Safe Transaction
+    await prisma.$transaction(async (tx) => {
       // a. Update the project's text fields
       await tx.project.update({
         where: { id: projectId },
@@ -104,8 +100,41 @@ export const PUT: APIRoute = async ({ params, request }) => {
           data: newImageUrls.map((url) => ({
             url,
             projectId: projectId,
+            isThumbnail: false, // New images are not thumbnails by default
           })),
         });
+      }
+
+      // d. Update thumbnail selection
+      if (thumbnailId) {
+        // First, set all images for this project to be non-thumbnails
+        await tx.projectImage.updateMany({
+          where: { projectId: projectId },
+          data: { isThumbnail: false },
+        });
+
+        // Then, set the selected image as the thumbnail
+        await tx.projectImage.update({
+          where: { id: Number(thumbnailId) },
+          data: { isThumbnail: true },
+        });
+      }
+
+      // e. Final check: Ensure a thumbnail exists if there are any images left
+      const remainingImages = await tx.projectImage.findMany({
+        where: { projectId: projectId },
+        orderBy: { id: "asc" },
+      });
+
+      if (remainingImages.length > 0) {
+        const hasThumbnail = remainingImages.some((img) => img.isThumbnail);
+        if (!hasThumbnail) {
+          // If no thumbnail is set (e.g., the old one was deleted), set the first image as the new thumbnail.
+          await tx.projectImage.update({
+            where: { id: remainingImages[0].id },
+            data: { isThumbnail: true },
+          });
+        }
       }
     });
 
@@ -122,8 +151,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 };
 
-// --- API endpoint for DELETING a project ---
+// API endpoint for DELETING a project
 export const DELETE: APIRoute = async ({ params }) => {
+  // This part does not need changes, but is included for completeness.
   const projectId = Number(params.id);
   if (isNaN(projectId)) {
     return new Response(
@@ -133,7 +163,6 @@ export const DELETE: APIRoute = async ({ params }) => {
   }
 
   try {
-    // Find the project and its images before deleting
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: { images: true },
@@ -146,15 +175,13 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    // Delete all associated images from Cloudinary
     if (project.images.length > 0) {
-      const deletePromises = project.images.map((img: any) =>
+      const deletePromises = project.images.map((img) =>
         cloudinary.uploader.destroy(getPublicIdFromUrl(img.url)),
       );
       await Promise.all(deletePromises);
     }
 
-    // Delete the project and its related images from the database (cascade delete)
     await prisma.project.delete({
       where: { id: projectId },
     });

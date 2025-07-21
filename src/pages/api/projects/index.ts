@@ -3,10 +3,8 @@ import type { APIRoute } from "astro";
 import { PrismaClient } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
 
-// This tells Astro to run this endpoint on the server, which is required for API routes.
 export const prerender = false;
 
-// Configure Cloudinary with your credentials from the .env file
 cloudinary.config({
   cloud_name: import.meta.env.CLOUDINARY_CLOUD_NAME,
   api_key: import.meta.env.CLOUDINARY_API_KEY,
@@ -16,12 +14,11 @@ cloudinary.config({
 
 const prisma = new PrismaClient();
 
-// API endpoint for creating new projects
 export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
 
-    // --- Get all text fields ---
+    // --- Get all text fields (no change) ---
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const type = formData.get("type") as string | null;
@@ -30,31 +27,37 @@ export const POST: APIRoute = async ({ request }) => {
     const surface = formData.get("surface") as string | null;
     const client = formData.get("client") as string | null;
 
-    // --- Get all uploaded files ---
+    // --- Get all uploaded files (no change) ---
     const imageFiles = formData.getAll("images") as File[];
 
-    // --- Validation ---
-    if (!title || !description || !imageFiles || imageFiles.length === 0) {
+    // --- Get the selected thumbnail index ---
+    const thumbnailIndex = parseInt(formData.get("thumbnail") as string, 10);
+
+    // --- Validation (updated to check for thumbnail selection) ---
+    if (
+      !title ||
+      !description ||
+      !imageFiles ||
+      imageFiles.length === 0 ||
+      isNaN(thumbnailIndex)
+    ) {
       return new Response(
         JSON.stringify({
           message:
-            "Error: Título, descripción y al menos una imagen son requeridos.",
+            "Error: Título, descripción y al menos una imagen (con una portada seleccionada) son requeridos.",
         }),
         { status: 400 },
       );
     }
 
-    // --- Upload all images to Cloudinary in parallel ---
+    // --- Upload images to Cloudinary (no change) ---
     const uploadPromises = imageFiles.map((file) => {
       return new Promise<string>(async (resolve, reject) => {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         cloudinary.uploader
           .upload_stream(
-            {
-              folder: "cobaires_projects",
-              resource_type: "image",
-            },
+            { folder: "cobaires_projects", resource_type: "image" },
             (error, result) => {
               if (error) return reject(error);
               if (result) return resolve(result.secure_url);
@@ -63,10 +66,9 @@ export const POST: APIRoute = async ({ request }) => {
           .end(buffer);
       });
     });
-
     const imageUrls = await Promise.all(uploadPromises);
 
-    // --- Save everything to the database in a single transaction ---
+    // --- Save everything to the database (THIS PART IS UPDATED) ---
     const newProject = await prisma.project.create({
       data: {
         title,
@@ -76,9 +78,12 @@ export const POST: APIRoute = async ({ request }) => {
         location,
         surface,
         client,
-        // Create the related image records at the same time
         images: {
-          create: imageUrls.map((url) => ({ url })),
+          // Map over the URLs and set the 'isThumbnail' flag based on the index
+          create: imageUrls.map((url, index) => ({
+            url,
+            isThumbnail: index === thumbnailIndex,
+          })),
         },
       },
     });

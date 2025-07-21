@@ -27,6 +27,9 @@ model ProjectImage {
   url       String
   projectId Int
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // --- Add this line ---
+  isThumbnail Boolean @default(false)
 }
 
 // --- CRM Models ---
