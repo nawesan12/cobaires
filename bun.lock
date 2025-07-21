@@ -6,6 +6,7 @@
       "dependencies": {
         "@astrojs/vercel": "^8.2.2",
         "@hubspot/api-client": "^13.0.0",
+        "@iconify/tailwind": "^1.2.0",
         "@lucide/astro": "^0.523.0",
         "@prisma/client": "^6.12.0",
         "@tailwindcss/vite": "^4.1.11",
@@ -94,6 +95,10 @@
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.25.5", "", { "os": "win32", "cpu": "x64" }, "sha512-TXv6YnJ8ZMVdX+SXWVBo/0p8LTcrUYngpWjvm91TMjjBQii7Oz11Lw5lbDV5Y0TzuhSJHwiH4hEtC1I42mMS0g=="],
 
     "@hubspot/api-client": ["@hubspot/api-client@13.0.0", "", { "dependencies": { "@types/node": "*", "@types/node-fetch": "^2.5.7", "bottleneck": "^2.19.5", "es6-promise": "^4.2.4", "form-data": "^2.5.0", "lodash.merge": "^4.6.2", "node-fetch": "^2.6.0" } }, "sha512-sXC1kRna+2uFlct1E1IQJQi53X36k24jRctmTTKzlvUM8it5VHXt6PCjVskQ4faLYGPyx9xh9GNx0GI7RMY4CQ=="],
+
+    "@iconify/tailwind": ["@iconify/tailwind@1.2.0", "", { "dependencies": { "@iconify/types": "^2.0.0" } }, "sha512-KgpIHWOTcRYw1XcoUqyNSrmYyfLLqZYu3AmP8zdfLk0F5TqRO8YerhlvlQmGfn7rJXgPeZN569xPAJnJ53zZxA=="],
+
+    "@iconify/types": ["@iconify/types@2.0.0", "", {}, "sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg=="],
 
     "@img/sharp-darwin-arm64": ["@img/sharp-darwin-arm64@0.33.5", "", { "optionalDependencies": { "@img/sharp-libvips-darwin-arm64": "1.0.4" }, "os": "darwin", "cpu": "arm64" }, "sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ=="],
 
