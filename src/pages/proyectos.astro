@@ -1,8 +1,8 @@
-
 ---
-import Layout from "../layouts/Layout.astro"; // Corrected path
-import Header from "../components/Header.astro"; // Corrected path
-import SecondHeader from "../components/SecondHeader.astro"; // Corrected path
+// src/pages/proyectos/index.astro
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import SecondHeader from "../components/SecondHeader.astro";
 import { PrismaClient } from "@prisma/client";
 
 export const prerender = false;
@@ -43,15 +43,16 @@ const projects = await prisma.project.findMany({
     >
       {
         projects.map((project) => (
-          // 1. Add "project-card" class for our script
+          // We add "project-card" for the script to find it
           <article class="project-card group relative h-96 w-full cursor-pointer overflow-hidden rounded-2xl p-4 shadow-lg">
+
             <div
-              class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out scale-110 group-hover:scale-100 active:scale-100"
+              class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out scale-110 group-hover:scale-100 group-[.is-active]:scale-100"
               style={`background-image: url('${project.images[0].url}')`}
             />
 
             <div
-              class="absolute bottom-4 left-4 right-4 flex flex-col justify-end rounded-lg bg-[#666695] p-4 text-white opacity-0 translate-y-8 transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 active:opacity-100 active:translate-y-0"
+              class="absolute bottom-4 left-4 right-4 flex flex-col justify-end rounded-lg bg-[#666695] p-4 text-white opacity-0 translate-y-8 transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:translate-y-0 group-[.is-active]:opacity-100 group-[.is-active]:translate-y-0"
             >
               <h3 class="truncate text-xl font-bold">{project.title}</h3>
               <span class="text-sm text-white/80">
@@ -60,7 +61,7 @@ const projects = await prisma.project.findMany({
               <div class="mt-4 flex items-center justify-between">
                 <small>{project.location}</small>
                 <a
-                  href={`/${project.id}`}
+                  href={`/proyectos/${project.id}`}
                   class="border border-white rounded-full px-4 py-1.5 text-sm transition-colors hover:bg-white hover:text-[#666695]"
                 >
                   Ver más
@@ -78,7 +79,6 @@ const projects = await prisma.project.findMany({
   document.addEventListener("DOMContentLoaded", () => {
     const projectCards = document.querySelectorAll(".project-card");
 
-    // Function to remove 'is-active' from all cards
     const deactivateAllCards = () => {
       projectCards.forEach((card) => {
         card.classList.remove("is-active");
@@ -87,21 +87,22 @@ const projects = await prisma.project.findMany({
 
     projectCards.forEach((card) => {
       card.addEventListener("click", (event) => {
-        // If the clicked card is already active, let the link click through
-        if (card.classList.contains("is-active")) {
-          return;
-        }
+        const wasActive = card.classList.contains("is-active");
 
-        // If another card is active, deactivate it first
+        // First, deactivate all cards
         deactivateAllCards();
 
-        // Activate the clicked card and stop the event from closing it immediately
-        card.classList.add("is-active");
+        // If the card was not active, activate it now
+        if (!wasActive) {
+          card.classList.add("is-active");
+        }
+
+        // Prevent click from bubbling up to the document and closing the card
         event.stopPropagation();
       });
     });
 
-    // Add a listener to the whole document to close cards when clicking outside
+    // Listener to close cards when clicking anywhere else on the page
     document.addEventListener("click", () => {
       deactivateAllCards();
     });
