@@ -62,7 +62,7 @@ const projects = await prisma.project.findMany({
                 <small>{project.location}</small>
                 <a
                   href={`/${project.id}`}
-                  class="border border-white rounded-full px-4 py-1.5 text-sm transition-colors hover:bg-white hover:text-[#666695]"
+                  class="border border-white rounded-full px-4 py-1.5 text-sm transition-colors whitespace-nowrap hover:bg-white hover:text-[#666695]"
                 >
                   Ver más
                 </a>
