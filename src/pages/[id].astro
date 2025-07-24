@@ -5,50 +5,49 @@ import Header from "../components/Header.astro";
 import SecondHeader from "../components/SecondHeader.astro";
 import { PrismaClient } from "@prisma/client";
 
-// --- FIX: This line switches the page from static (SSG) to dynamic (SSR) ---
-// It tells Astro to generate this page on the server for every request,
-// ensuring it can find newly created projects without needing a rebuild.
 export const prerender = false;
 
 const prisma = new PrismaClient();
 
-// NOTE: The getStaticPaths function has been removed because this is now a
-// server-rendered page. It will dynamically handle any project ID.
-
-// Get the specific project data for this page using the ID from the URL.
 const { id } = Astro.params;
 const project = await prisma.project.findUnique({
     where: { id: Number(id) },
-    // We use 'include' to also fetch the related images for the carousel.
     include: {
         images: {
             orderBy: {
-                id: "asc", // Ensure images are always in a consistent order
+                id: "asc",
             },
         },
     },
 });
 
-// Prepare the image URLs for the client-side carousel script.
+// FIX: If no project is found, Astro will show a 404 page.
+// This prevents errors like "Cannot read properties of null" later on.
+if (!project) {
+    return new Response(null, {
+        status: 404,
+        statusText: 'Not Found'
+    });
+}
+
+// Safely map image URLs
 const imageUrls = project.images.map((img) => img.url);
 ---
 
 <Layout>
     <div class="block lg:hidden">
-       <Header />
-     </div>
+        <Header />
+    </div>
 
-     <!-- Show SecondHeader on desktop -->
-     <div class="hidden lg:block">
-       <SecondHeader />
-     </div>
+    <div class="hidden lg:block">
+        <SecondHeader />
+    </div>
 
     <section
         class="px-4 md:px-4 lg:px-0 lg:max-w-7xl w-full mx-auto flex flex-col gap-11 py-12"
     >
         <!-- Carousel Section -->
         <div id="carousel-container" class="relative overflow-hidden">
-            <!-- The image now loads the first URL from our dynamic list -->
             <img
                 id="carousel-image"
                 src={imageUrls[0] || "/placeholder.png"}
@@ -67,17 +66,14 @@ const imageUrls = project.images.map((img) => img.url);
         <div
             class="px-4 lg:px-0 lg:max-w-4xl mx-auto flex flex-col w-full gap-11"
         >
-            <!-- Project Title is now dynamic -->
             <h2 class="font-medium text-3xl text-[#051314]">
                 {project.title}
             </h2>
 
-            <!-- Project Description is now dynamic -->
             <p class="text-gray-700 leading-relaxed whitespace-pre-line">
                 {project.description}
             </p>
 
-            <!-- Project Details list is now dynamic, with conditional rendering for optional fields -->
             <ul class="flex flex-col gap-4 mb-20">
                 <li
                     class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3"
@@ -123,7 +119,7 @@ const imageUrls = project.images.map((img) => img.url);
                                 {project.year}
                             </p>
                         </li>
-                    )
+                    ) /* FIX: Changed closing '}' to ')' */
                 }
                 {
                     project.surface && (
@@ -135,7 +131,7 @@ const imageUrls = project.images.map((img) => img.url);
                                 {project.surface}
                             </p>
                         </li>
-                    )
+                    ) /* FIX: Changed closing '}' to ')' */
                 }
                 {
                     project.client && (
@@ -147,7 +143,7 @@ const imageUrls = project.images.map((img) => img.url);
                                 {project.client}
                             </p>
                         </li>
-                    )
+                    ) /* FIX: Changed closing '}' to ')' */
                 }
             </ul>
         </div>
@@ -155,9 +151,7 @@ const imageUrls = project.images.map((img) => img.url);
 </Layout>
 
 <script define:vars={{ imageUrls }}>
-    // --- Carousel Logic ---
     document.addEventListener("DOMContentLoaded", () => {
-        // Use the dynamic image URLs passed from the server
         const images = imageUrls;
 
         if (!images || images.length === 0) {
@@ -176,6 +170,24 @@ const imageUrls = project.images.map((img) => img.url);
         let startPos = 0;
         let currentTranslate = 0;
 
+        // Variables for auto-play logic
+        let autoPlayTimer = null;
+        const AUTO_PLAY_INTERVAL = 2000; // 2 seconds
+
+        // Advances to the next slide
+        const nextSlide = () => {
+            currentIndex = (currentIndex + 1) % images.length;
+            updateCarousel();
+        };
+
+        // Restarts the auto-play timer
+        const resetAutoPlay = () => {
+            if (images.length <= 1) return;
+
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = setInterval(nextSlide, AUTO_PLAY_INTERVAL);
+        };
+
         const updateCarousel = () => {
             carouselImage.src = images[currentIndex];
             carouselImage.alt = `Imagen del carrusel ${currentIndex + 1}`;
@@ -183,41 +195,40 @@ const imageUrls = project.images.map((img) => img.url);
             const dots = dotsContainer.children;
             for (let i = 0; i < dots.length; i++) {
                 const dot = dots[i];
-                dot.classList.remove("bg-[#051314]", "w-8");
-                dot.classList.add("bg-gray-300", "w-3");
+                const isActive = i === currentIndex;
+                dot.classList.toggle("bg-[#666695]", isActive);
+                dot.classList.toggle("w-8", isActive);
+                dot.classList.toggle("bg-gray-300", !isActive);
+                dot.classList.toggle("w-3", !isActive);
             }
-            dots[currentIndex]?.classList.add("bg-[#051314]", "w-8");
-            dots[currentIndex]?.classList.remove("bg-gray-300", "w-3");
         };
 
+        // Create navigation dots
         images.forEach((_, index) => {
             const dot = document.createElement("button");
-            dot.classList.add(
-                "h-3",
-                "rounded-full",
-                "transition-all",
-                "duration-300",
-                "ease-in-out",
-            );
+            dot.classList.add("h-3", "rounded-full", "transition-all", "duration-300", "ease-in-out");
             dot.setAttribute("aria-label", `Ir a la imagen ${index + 1}`);
             dot.addEventListener("click", () => {
                 currentIndex = index;
                 updateCarousel();
+                resetAutoPlay();
             });
             dotsContainer.appendChild(dot);
         });
 
+        // Event handlers for dragging/swiping
         const dragStart = (event) => {
+            if (images.length <= 1) return;
             isDragging = true;
-            startPos =
-                "touches" in event ? event.touches[0].clientX : event.clientX;
+            startPos = "touches" in event ? event.touches[0].clientX : event.clientX;
+            // Pause the timer on interaction
+            clearInterval(autoPlayTimer);
             event.preventDefault();
         };
 
         const dragging = (event) => {
             if (!isDragging) return;
-            const currentPosition =
-                "touches" in event ? event.touches[0].clientX : event.clientX;
+            const currentPosition = "touches" in event ? event.touches[0].clientX : event.clientX;
             currentTranslate = currentPosition - startPos;
         };
 
@@ -225,28 +236,30 @@ const imageUrls = project.images.map((img) => img.url);
             if (!isDragging) return;
             isDragging = false;
             const movedBy = currentTranslate;
+
             if (movedBy < -50 && currentIndex < images.length - 1) {
                 currentIndex++;
             }
             if (movedBy > 50 && currentIndex > 0) {
                 currentIndex--;
             }
+
             updateCarousel();
+            resetAutoPlay(); // A swipe resets the timer
             currentTranslate = 0;
         };
 
+        // Add event listeners
         carouselContainer.addEventListener("mousedown", dragStart);
-        carouselContainer.addEventListener("touchstart", dragStart, {
-            passive: true,
-        });
+        carouselContainer.addEventListener("touchstart", dragStart, { passive: true });
         carouselContainer.addEventListener("mouseup", dragEnd);
         carouselContainer.addEventListener("touchend", dragEnd);
         carouselContainer.addEventListener("mouseleave", dragEnd);
         carouselContainer.addEventListener("mousemove", dragging);
-        carouselContainer.addEventListener("touchmove", dragging, {
-            passive: true,
-        });
+        carouselContainer.addEventListener("touchmove", dragging, { passive: true });
 
+        // Initial setup
         updateCarousel();
+        resetAutoPlay();
     });
 </script>
