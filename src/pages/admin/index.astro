@@ -1,10 +1,47 @@
 ---
 // src/pages/dashboard/index.astro
-import Layout from "../../layouts/Layout.astro"; // Adjust path as needed
+import Layout from "../../layouts/Layout.astro";
 import { PrismaClient } from "@prisma/client";
 
 export const prerender = false;
 
+// --- Basic Authentication ---
+// These are the hardcoded credentials for accessing the dashboard.
+const ADMIN_USER = "cobaires";
+const ADMIN_PASS = "cobairesadmin";
+
+const authHeader = Astro.request.headers.get('authorization');
+
+// 1. Check if the Authorization header is present.
+if (!authHeader) {
+    // If not, send a 401 Unauthorized response to trigger the browser's login prompt.
+    return new Response('Authentication required.', {
+        status: 401,
+        headers: {
+            'WWW-Authenticate': 'Basic realm="Secure Area"',
+        },
+    });
+}
+
+// 2. Decode the credentials from the header.
+// The header format is "Basic BASE64_ENCODED_CREDENTIALS"
+const encodedCreds = authHeader.split(' ')[1];
+const decodedCreds = Buffer.from(encodedCreds, 'base64').toString('utf-8');
+const [user, pass] = decodedCreds.split(':');
+
+// 3. Validate the credentials.
+if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+    // If they don't match, send the same 401 response.
+    return new Response('Invalid credentials.', {
+        status: 401,
+        headers: {
+            'WWW-Authenticate': 'Basic realm="Secure Area"',
+        },
+    });
+}
+// --- End of Authentication ---
+
+// If authentication is successful, the rest of the page code will run.
 const prisma = new PrismaClient();
 
 // --- Fetch Analytics Data ---
@@ -33,18 +70,15 @@ const [
 <Layout title="Dashboard - Inicio">
     <main class=" min-h-screen p-4 sm:p-6 lg:p-8">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
             <div class="mb-10">
                 <h1 class="text-4xl font-bold text-gray-800">
                     Panel de Control | Cobaires
                 </h1>
             </div>
 
-            <!-- Stats Cards Grid -->
             <div
                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
             >
-                <!-- Total Projects Card -->
                 <div
                     class="bg-white p-6 rounded-2xl shadow-lg flex items-center gap-6"
                 >
@@ -70,7 +104,6 @@ const [
                         </p>
                     </div>
                 </div>
-                <!-- Open Conversations Card -->
                 <div
                     class="bg-white p-6 rounded-2xl shadow-lg flex items-center gap-6"
                 >
@@ -96,7 +129,6 @@ const [
                         </p>
                     </div>
                 </div>
-                <!-- Total Conversations Card -->
                 <div
                     class="bg-white p-6 rounded-2xl shadow-lg flex items-center gap-6"
                 >
@@ -126,9 +158,7 @@ const [
                 </div>
             </div>
 
-            <!-- Navigation and Recent Activity Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <!-- Projects Column -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg flex flex-col">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">
                         Administrar Proyectos
@@ -157,7 +187,6 @@ const [
                     </a>
                 </div>
 
-                <!-- Messages Column -->
                 <div class="bg-white p-8 rounded-2xl shadow-lg flex flex-col">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">
                         Bandeja de Entrada
