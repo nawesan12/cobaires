@@ -1,14 +1,27 @@
 ---
-import { ArrowLeft } from "@lucide/astro";
+// src/components/SecondHeader.astro
+
+// Get the current URL's pathname.
+const { pathname } = Astro.url;
+
+// Determine if the current path is a numeric ID for a project page (e.g., '/123').
+const pathSegment = pathname.substring(1); // Get content after the leading '/'
+const isProjectPage = pathSegment.length > 0 && !isNaN(Number(pathSegment));
+
+// Set the href for the back button dynamically.
+// If it's a project page, link to '/proyectos'. Otherwise, link to the homepage.
+const backUrl = isProjectPage ? "/proyectos" : "/";
 ---
 
 <header
     class="w-screen px-4 lg:px-0 lg:max-w-7xl mx-auto py-20 flex items-center justify-between"
 >
+    {/* The href now uses the dynamic backUrl variable */}
     <a
-        href="/"
+        href={backUrl}
         class="border rounded-full flex items-center gap-2 px-4 py-2 hover:text-[#EFE8E6] hover:bg-[#051314] transition-all duration-200"
-        ><svg
+    >
+        <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
@@ -19,10 +32,12 @@ import { ArrowLeft } from "@lucide/astro";
             stroke-linecap="round"
             stroke-linejoin="round"
             class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left"
-            ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
-                d="M15 6l-6 6l6 6"></path></svg
-        > Volver</a
-    >
+        >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M15 6l-6 6l6 6"></path>
+        </svg>
+        Volver
+    </a>
 
     <img src="/iso-black.svg" class="h-16" alt="Cobaires" />
 </header>
