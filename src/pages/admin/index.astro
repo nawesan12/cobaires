@@ -5,47 +5,18 @@ import { PrismaClient } from "@prisma/client";
 
 export const prerender = false;
 
-// --- Basic Authentication ---
-// These are the hardcoded credentials for accessing the dashboard.
-const ADMIN_USER = "cobaires";
-const ADMIN_PASS = "cobairesadmin";
+// --- New Cookie-based Authentication ---
+const sessionToken = Astro.cookies.get('session-token');
 
-const authHeader = Astro.request.headers.get('authorization');
-
-// 1. Check if the Authorization header is present.
-if (!authHeader) {
-    // If not, send a 401 Unauthorized response to trigger the browser's login prompt.
-    return new Response('Authentication required.', {
-        status: 401,
-        headers: {
-            'WWW-Authenticate': 'Basic realm="Secure Area"',
-        },
-    });
-}
-
-// 2. Decode the credentials from the header.
-// The header format is "Basic BASE64_ENCODED_CREDENTIALS"
-const encodedCreds = authHeader.split(' ')[1];
-const decodedCreds = Buffer.from(encodedCreds, 'base64').toString('utf-8');
-const [user, pass] = decodedCreds.split(':');
-
-// 3. Validate the credentials.
-if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
-    // If they don't match, send the same 401 response.
-    return new Response('Invalid credentials.', {
-        status: 401,
-        headers: {
-            'WWW-Authenticate': 'Basic realm="Secure Area"',
-        },
-    });
+// If the session cookie doesn't exist or is invalid, redirect to the login page.
+if (!sessionToken || sessionToken.value !== 'user-is-logged-in') {
+    return Astro.redirect('/login');
 }
 // --- End of Authentication ---
 
 // If authentication is successful, the rest of the page code will run.
 const prisma = new PrismaClient();
 
-// --- Fetch Analytics Data ---
-// We run all queries in parallel for better performance.
 const [
     projectCount,
     conversationCount,
