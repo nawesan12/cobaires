@@ -27,10 +27,8 @@ export const POST: APIRoute = async ({ request }) => {
     const surface = (formData.get("surface") as string) || null;
     const client = (formData.get("client") as string) || null;
 
-    // --- FIX: Get uploaded files using the correct name 'newImages' ---
+    // --- Get uploaded files and thumbnail index from form ---
     const newImages = formData.getAll("newImages") as File[];
-
-    // --- FIX: Get the selected thumbnail index using the correct name 'thumbnailSelection' ---
     const thumbnailIndex = parseInt(
       formData.get("thumbnailSelection") as string,
       10,
@@ -53,24 +51,49 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // --- Upload images to Cloudinary ---
+    // --- Upload images to Cloudinary with improved error handling ---
     const uploadPromises = newImages.map((file) => {
       return new Promise<string>(async (resolve, reject) => {
-        // Ensure file is valid before processing
         if (!file || file.size === 0) {
-          return reject(new Error("Invalid file provided."));
+          return reject(
+            new Error("Se proporcionó un archivo inválido o vacío."),
+          );
         }
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        cloudinary.uploader
-          .upload_stream(
-            { folder: "cobaires_projects", resource_type: "image" },
-            (error, result) => {
-              if (error) return reject(error);
-              if (result) return resolve(result.secure_url);
-            },
-          )
-          .end(buffer);
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+
+          cloudinary.uploader
+            .upload_stream(
+              { folder: "cobaires_projects", resource_type: "image" },
+              (error, result) => {
+                // If Cloudinary returns an error, reject the promise
+                if (error) {
+                  // Log the detailed error from Cloudinary
+                  console.error(
+                    "Cloudinary Upload Error:",
+                    JSON.stringify(error, null, 2),
+                  );
+                  return reject(
+                    new Error(`Error de Cloudinary: ${error.message}`),
+                  );
+                }
+                // If the result exists and has a secure URL, resolve the promise
+                if (result && result.secure_url) {
+                  return resolve(result.secure_url);
+                }
+                // If there's no result or URL for some reason, reject
+                return reject(
+                  new Error("La subida a Cloudinary no devolvió una URL."),
+                );
+              },
+            )
+            .end(buffer);
+        } catch (e) {
+          return reject(
+            new Error("No se pudo procesar el archivo para la subida."),
+          );
+        }
       });
     });
     const imageUrls = await Promise.all(uploadPromises);
@@ -86,7 +109,6 @@ export const POST: APIRoute = async ({ request }) => {
         surface,
         client,
         images: {
-          // Map over the URLs and set the 'isThumbnail' flag based on the index
           create: imageUrls.map((url, index) => ({
             url,
             isThumbnail: index === thumbnailIndex,
@@ -103,15 +125,17 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 201 },
     );
   } catch (error) {
+    // This will now catch the more specific errors from the upload promises
     console.error("Error creating project:", error);
-    return new Response(
-      JSON.stringify({ message: "Error interno del servidor." }),
-      { status: 500 },
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Error interno del servidor.";
+    return new Response(JSON.stringify({ message: errorMessage }), {
+      status: 500,
+    });
   }
 };
 
-// API endpoint for fetching all projects (no changes needed here)
+// API endpoint for fetching all projects
 export const GET: APIRoute = async () => {
   try {
     const projects = await prisma.project.findMany({

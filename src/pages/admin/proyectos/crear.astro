@@ -7,7 +7,7 @@ import Layout from "../../../layouts/Layout.astro";
   <main class="min-h-screen p-4 sm:p-6 lg:p-8">
     <div class="max-w-4xl mx-auto">
       <div class="mb-10">
-        <a href="/admin/proyectos" class="text-blue-600 hover:underline mb-2 inline-block">&larr; Volver a Proyectos</a>
+        <a href="/dashboard/proyectos" class="text-blue-600 hover:underline mb-2 inline-block">&larr; Volver a Proyectos</a>
         <h1 class="text-4xl font-bold text-gray-800">Crear Nuevo Proyecto</h1>
         <p class="text-lg text-gray-500">Completá los detalles a continuación para añadir un nuevo proyecto al portfolio.</p>
       </div>
@@ -84,15 +84,12 @@ import Layout from "../../../layouts/Layout.astro";
   const imageUpload = document.getElementById("image-upload");
   const previewsContainer = document.getElementById("previews-container");
 
-  let uploadedFiles = [];
-
   // Handle new image uploads and show previews
   imageUpload.addEventListener("change", () => {
-    uploadedFiles = Array.from(imageUpload.files); // Store the selected files
-    if (uploadedFiles.length > 0) {
+    if (imageUpload.files.length > 0) {
       previewsContainer.classList.remove("hidden");
       previewsContainer.innerHTML = ""; // Clear existing previews
-      uploadedFiles.forEach((file, index) => {
+      Array.from(imageUpload.files).forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const wrapper = document.createElement('div');
@@ -103,6 +100,7 @@ import Layout from "../../../layouts/Layout.astro";
           img.className = "w-full h-32 object-cover rounded-md";
           wrapper.appendChild(img);
 
+          // Add a radio button overlay for thumbnail selection
           const radioLabel = document.createElement('label');
           radioLabel.className = 'absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity rounded-md';
 
@@ -111,11 +109,15 @@ import Layout from "../../../layouts/Layout.astro";
           radioInput.name = 'thumbnailSelection';
           radioInput.value = index;
           radioInput.className = 'h-6 w-6 accent-blue-500';
-          if (index === 0) radioInput.checked = true;
+
+          if (index === 0) {
+              radioInput.checked = true; // Default check the first image
+          }
 
           radioLabel.appendChild(radioInput);
           wrapper.appendChild(radioLabel);
 
+          // Add a badge to the currently checked thumbnail
           const thumbnailBadge = document.createElement('div');
           thumbnailBadge.textContent = 'Portada';
           thumbnailBadge.className = 'badge absolute top-1 right-1 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded hidden';
@@ -129,71 +131,31 @@ import Layout from "../../../layouts/Layout.astro";
     }
   });
 
+  // Update the "Portada" badge visibility when a new thumbnail is selected
   previewsContainer.addEventListener('change', (e) => {
       if (e.target.name === 'thumbnailSelection') {
+          // Hide all badges
           document.querySelectorAll('.badge').forEach(badge => badge.classList.add('hidden'));
+          // Show the badge for the selected image's parent
           e.target.closest('.relative.group').querySelector('.badge').classList.remove('hidden');
       }
   });
 
-  // --- UPDATED FORM SUBMISSION LOGIC ---
+  // Handle form submission
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const originalButtonText = submitButton.textContent;
     submitButton.disabled = true;
-    submitButton.textContent = "Subiendo imágenes...";
+    submitButton.textContent = "Creando...";
     statusMessage.textContent = "";
 
+    const formData = new FormData(form);
+
     try {
-      // 1. Get Cloudinary signature from our new API endpoint
-      const signatureResponse = await fetch('/api/sign-cloudinary-upload', {
-          method: 'POST'
-      });
-      const { signature, timestamp, api_key } = await signatureResponse.json();
-
-      // 2. Upload each file directly to Cloudinary
-      const uploadPromises = uploadedFiles.map(file => {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('signature', signature);
-          formData.append('timestamp', timestamp);
-          formData.append('api_key', api_key);
-          formData.append('folder', 'cobaires_projects');
-
-          return fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
-              method: 'POST',
-              body: formData
-          }).then(res => res.json());
-      });
-
-      const uploadedImages = await Promise.all(uploadPromises);
-      const imageUrls = uploadedImages.map(result => result.secure_url);
-
-      if (imageUrls.some(url => !url)) {
-          throw new Error('Una o más imágenes no se pudieron subir a Cloudinary.');
-      }
-
-      // 3. Submit the project data (with Cloudinary URLs) to our backend
-      submitButton.textContent = "Guardando proyecto...";
-
-      const projectData = {
-          title: form.title.value,
-          description: form.description.value,
-          type: form.type.value,
-          year: form.year.value,
-          location: form.location.value,
-          surface: form.surface.value,
-          client: form.client.value,
-          imageUrls: imageUrls,
-          thumbnailIndex: parseInt(form.thumbnailSelection.value, 10)
-      };
-
-      const response = await fetch('/api/projects', {
+      const response = await fetch(`/api/projects`, {
         method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(projectData),
+        body: formData,
       });
-
       const result = await response.json();
       if (!response.ok) {
         throw new Error(result.message || "Algo salió mal al crear el proyecto.");
@@ -207,8 +169,7 @@ import Layout from "../../../layouts/Layout.astro";
       }, 1500);
 
     } catch (error) {
-      statusMessage.textContent = `Error: ${error.message}`;
-      statusMessage.className = "mt-6 text-center font-medium text-red-600";
+      statusMessage.textContent = error.message;
       submitButton.disabled = false;
       submitButton.textContent = originalButtonText;
     }
