@@ -251,48 +251,62 @@ const existingImages = project.images;
 
   // Logic for handling new image uploads and previews
   imageUpload.addEventListener("change", () => {
+    previewsContainer.innerHTML = ""; // Clear old previews
     if (imageUpload.files.length > 0) {
-      previewsContainer.classList.remove("hidden");
-      previewsContainer.innerHTML = "";
       Array.from(imageUpload.files).forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
+          // Create the wrapper div
+          const wrapper = document.createElement("div");
+          wrapper.className = "relative group h-32 border-2 border-dashed border-blue-300 rounded-md p-1";
+
+          // Create the image preview
           const img = document.createElement("img");
           img.src = e.target.result;
-          img.className = "w-full h-32 object-cover rounded-md";
-          previewsContainer.appendChild(img);
+          img.className = "w-full h-full object-cover rounded-sm";
+
+          // Create the radio button overlay
+          const radioOverlay = document.createElement("div");
+          radioOverlay.className = "absolute bottom-0 left-0 right-0 h-8 bg-black/50 flex items-center justify-center rounded-b-sm opacity-80 group-hover:opacity-100 transition-opacity";
+
+          // Create the radio button
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "thumbnail";
+          radio.title = "Seleccionar como portada";
+          // Use a special value format for new images
+          radio.value = `new:${file.name}`;
+          radio.className = "h-5 w-5 cursor-pointer accent-blue-500";
+
+          radioOverlay.appendChild(radio);
+          wrapper.appendChild(img);
+          wrapper.appendChild(radioOverlay);
+          previewsContainer.appendChild(wrapper);
         };
         reader.readAsDataURL(file);
       });
     }
   });
-
   // Logic for deleting existing images
   let imagesToDelete = [];
-  deleteImageBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const button = e.currentTarget;
-      const imageId = button.dataset.imageId;
-      const wrapper = document.querySelector(`[data-image-wrapper-id="${imageId}"]`);
+    deleteImageBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const button = e.currentTarget;
+        const imageId = button.dataset.imageId;
+        const wrapper = document.querySelector(`[data-image-wrapper-id="${imageId}"]`);
+        if (!wrapper) return;
+        const radio = wrapper.querySelector('input[type="radio"]');
 
-      if (!wrapper) return;
+        // We'll just hide it, not toggle. It's simpler.
+        if (!imagesToDelete.includes(imageId)) {
+            imagesToDelete.push(imageId);
+            wrapper.style.display = "none";
+            if (radio) radio.disabled = true; // Disable to prevent submission
+        }
 
-      const radio = wrapper.querySelector('input[type="radio"]');
-
-      if (imagesToDelete.includes(imageId)) {
-        // Undelete
-        imagesToDelete = imagesToDelete.filter((id) => id !== imageId);
-        wrapper.style.display = "block";
-        if (radio) radio.disabled = false;
-      } else {
-        // Mark for deletion
-        imagesToDelete.push(imageId);
-        wrapper.style.display = "none";
-        if (radio) radio.disabled = true;
-      }
-      imagesToDeleteInput.value = JSON.stringify(imagesToDelete);
+        imagesToDeleteInput.value = JSON.stringify(imagesToDelete.map(Number));
+      });
     });
-  });
 
   // Form submission logic
   form.addEventListener("submit", async (e) => {
