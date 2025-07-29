@@ -156,10 +156,12 @@ const existingImages = project.images;
             <label class="block text-sm font-medium text-gray-700 mb-1"
               >Imágenes del Proyecto</label
             >
+            <p class="text-xs text-gray-500 mb-3">Selecciona una imagen como portada. Las nuevas imágenes añadidas aparecerán debajo de las existentes.</p>
+
             <!-- Existing Images -->
             <div
               id="existing-images-container"
-              class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
             >
               {
                 existingImages.map((image) => (
@@ -195,7 +197,7 @@ const existingImages = project.images;
                         type="radio"
                         name="thumbnail"
                         title="Seleccionar como portada"
-                        value={image.id}
+                        value={`image:${image.id}`}
                         checked={image.isThumbnail}
                         class="h-5 w-5 cursor-pointer accent-blue-500"
                       />
@@ -210,17 +212,19 @@ const existingImages = project.images;
               id="images-to-delete"
             />
 
-            <!-- New Image Upload -->
+            <!-- New Image Previews will appear here -->
+            <div
+              id="previews-container"
+              class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+            ></div>
+
+            <!-- New Image Upload Button -->
             <div class="mt-4">
                 <label for="image-upload" class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-700">
                     + Añadir más imágenes...
                     <input id="image-upload" name="newImages" type="file" class="sr-only" multiple accept="image/png, image/jpeg, image/webp" />
                 </label>
             </div>
-            <div
-              id="previews-container"
-              class="hidden mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
-            ></div>
           </div>
 
           <!-- Submit Button -->
@@ -287,26 +291,33 @@ const existingImages = project.images;
       });
     }
   });
+
   // Logic for deleting existing images
   let imagesToDelete = [];
-    deleteImageBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const button = e.currentTarget;
-        const imageId = button.dataset.imageId;
-        const wrapper = document.querySelector(`[data-image-wrapper-id="${imageId}"]`);
-        if (!wrapper) return;
-        const radio = wrapper.querySelector('input[type="radio"]');
+  deleteImageBtns.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const button = e.currentTarget;
+      const imageId = button.dataset.imageId;
+      const wrapper = document.querySelector(`[data-image-wrapper-id="${imageId}"]`);
+      if (!wrapper) return;
+      const radio = wrapper.querySelector('input[type="radio"]');
 
-        // We'll just hide it, not toggle. It's simpler.
-        if (!imagesToDelete.includes(imageId)) {
-            imagesToDelete.push(imageId);
-            wrapper.style.display = "none";
-            if (radio) radio.disabled = true; // Disable to prevent submission
-        }
+      if (!imagesToDelete.includes(imageId)) {
+          imagesToDelete.push(imageId);
+          wrapper.style.display = "none";
+          if (radio) {
+            radio.disabled = true; // Disable to prevent submission
+            if (radio.checked) {
+              // If the deleted image was the thumbnail, find the first available radio and check it
+              const firstAvailableRadio = document.querySelector('input[name="thumbnail"]:not(:disabled)');
+              if(firstAvailableRadio) firstAvailableRadio.checked = true;
+            }
+          }
+      }
 
-        imagesToDeleteInput.value = JSON.stringify(imagesToDelete.map(Number));
-      });
+      imagesToDeleteInput.value = JSON.stringify(imagesToDelete.map(Number));
     });
+  });
 
   // Form submission logic
   form.addEventListener("submit", async (e) => {
@@ -331,7 +342,7 @@ const existingImages = project.images;
       statusMessage.textContent = "¡Proyecto actualizado con éxito!";
       statusMessage.className = "mt-6 text-center font-medium text-green-600";
       setTimeout(() => {
-        window.location.href = "/admin/proyectos";
+        window.location.href = "/admin/proyectos"; // Corrected URL
       }, 1500);
     } catch (error) {
       statusMessage.textContent = error.message;
