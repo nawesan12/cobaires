@@ -18,7 +18,8 @@ const prisma = new PrismaClient();
 // Helper to get Cloudinary public_id from a URL
 const getPublicIdFromUrl = (url: string) => {
   const parts = url.split("/");
-  const filename = parts.pop()?.split(".")[0];
+  const filenameWithExt = parts.pop();
+  const filename = filenameWithExt?.split(".")[0];
   return `cobaires_projects/${filename}`;
 };
 
@@ -48,7 +49,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const imagesToDelete: number[] = imagesToDeleteRaw
       ? JSON.parse(imagesToDeleteRaw)
       : [];
-    const thumbnailId = formData.get("thumbnail") as string;
+    const thumbnailSelection = formData.get("thumbnail") as string | null;
 
     // 1. Handle Deletion of Existing Images from Cloudinary
     if (imagesToDelete.length > 0) {
@@ -62,21 +63,31 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     // 2. Handle Upload of New Images to Cloudinary
-    let newImageUrls: string[] = [];
+    // We now need both the URL and the original filename to identify the thumbnail later.
+    let newImageData: { url: string; originalName: string }[] = [];
     if (newImageFiles.length > 0 && newImageFiles[0].size > 0) {
       const uploadPromises = newImageFiles.map(
         (file) =>
-          new Promise<string>(async (resolve, reject) => {
-            const buffer = Buffer.from(await file.arrayBuffer());
-            cloudinary.uploader
-              .upload_stream({ folder: "cobaires_projects" }, (err, result) => {
-                if (err) return reject(err);
-                if (result) return resolve(result.secure_url);
-              })
-              .end(buffer);
-          }),
+          new Promise<{ url: string; originalName: string }>(
+            async (resolve, reject) => {
+              const buffer = Buffer.from(await file.arrayBuffer());
+              cloudinary.uploader
+                .upload_stream(
+                  { folder: "cobaires_projects" },
+                  (err, result) => {
+                    if (err) return reject(err);
+                    if (result)
+                      return resolve({
+                        url: result.secure_url,
+                        originalName: file.name,
+                      });
+                  },
+                )
+                .end(buffer);
+            },
+          ),
       );
-      newImageUrls = await Promise.all(uploadPromises);
+      newImageData = await Promise.all(uploadPromises);
     }
 
     // 3. Update Database in a Single, Safe Transaction
@@ -95,29 +106,46 @@ export const PUT: APIRoute = async ({ params, request }) => {
       }
 
       // c. Create new image records in the database
-      if (newImageUrls.length > 0) {
+      if (newImageData.length > 0) {
         await tx.projectImage.createMany({
-          data: newImageUrls.map((url) => ({
-            url,
+          data: newImageData.map((data) => ({
+            url: data.url,
             projectId: projectId,
-            isThumbnail: false, // New images are not thumbnails by default
+            isThumbnail: false,
           })),
         });
       }
 
-      // d. Update thumbnail selection
-      if (thumbnailId) {
+      // d. Update thumbnail selection (now more robust)
+      if (thumbnailSelection) {
         // First, set all images for this project to be non-thumbnails
         await tx.projectImage.updateMany({
           where: { projectId: projectId },
           data: { isThumbnail: false },
         });
 
-        // Then, set the selected image as the thumbnail
-        await tx.projectImage.update({
-          where: { id: Number(thumbnailId) },
-          data: { isThumbnail: true },
-        });
+        if (thumbnailSelection.startsWith("image:")) {
+          // It's an existing image
+          const imageId = Number(thumbnailSelection.split(":")[1]);
+          if (!isNaN(imageId)) {
+            await tx.projectImage.update({
+              where: { id: imageId },
+              data: { isThumbnail: true },
+            });
+          }
+        } else if (thumbnailSelection.startsWith("new:")) {
+          // It's a newly uploaded image, identify it by its original name
+          const newImageName = thumbnailSelection.split(":")[1];
+          const correspondingNewImage = newImageData.find(
+            (img) => img.originalName === newImageName,
+          );
+          if (correspondingNewImage) {
+            await tx.projectImage.update({
+              where: { url: correspondingNewImage.url }, // URL is unique
+              data: { isThumbnail: true },
+            });
+          }
+        }
       }
 
       // e. Final check: Ensure a thumbnail exists if there are any images left
@@ -129,7 +157,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
       if (remainingImages.length > 0) {
         const hasThumbnail = remainingImages.some((img) => img.isThumbnail);
         if (!hasThumbnail) {
-          // If no thumbnail is set (e.g., the old one was deleted), set the first image as the new thumbnail.
+          // If no thumbnail is set (e.g., old one was deleted and no new one was chosen)
+          // set the first image as the new thumbnail.
           await tx.projectImage.update({
             where: { id: remainingImages[0].id },
             data: { isThumbnail: true },
@@ -150,6 +179,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
     );
   }
 };
+
+// ... DELETE endpoint remains the same ...
 
 // API endpoint for DELETING a project
 export const DELETE: APIRoute = async ({ params }) => {
