@@ -24,10 +24,10 @@ if (!project) {
 }
 
 // Pass the full image objects to the template
-const existingImages = project.images;
+const existingImages = project?.images;
 ---
 
-<Layout title={`Editando: ${project.title}`}>
+<Layout title={`Editando: ${project?.title}`}>
   <main class="min-h-screen p-4 sm:p-6 lg:p-8">
     <div class="max-w-4xl mx-auto">
       <div class="mb-10">
@@ -37,7 +37,7 @@ const existingImages = project.images;
           >&larr; Volver a Proyectos</a
         >
         <h1 class="text-4xl font-bold text-gray-800">Editando Proyecto</h1>
-        <p class="text-lg text-gray-500">{project.title}</p>
+        <p class="text-lg text-gray-500">{project?.title}</p>
       </div>
 
       <div class="bg-white p-8 rounded-2xl shadow-lg">
@@ -54,7 +54,7 @@ const existingImages = project.images;
               name="title"
               id="title"
               required
-              value={project.title}
+              value={project?.title}
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </div>
@@ -72,7 +72,7 @@ const existingImages = project.images;
               rows="6"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
-            >{project.description}</textarea>
+            >{project?.description}</textarea>
           </div>
 
           <!-- Grid for details -->
@@ -86,7 +86,7 @@ const existingImages = project.images;
                 type="text"
                 name="type"
                 id="type"
-                value={project.type || ""}
+                value={project?.type || ""}
                 placeholder="Ej: Proyección y dirección"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
@@ -100,7 +100,7 @@ const existingImages = project.images;
                 type="text"
                 name="year"
                 id="year"
-                value={project.year || ""}
+                value={project?.year || ""}
                 placeholder="Ej: 2023-2024"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
@@ -115,7 +115,7 @@ const existingImages = project.images;
                 type="text"
                 name="location"
                 id="location"
-                value={project.location || ""}
+                value={project?.location || ""}
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
             </div>
@@ -129,7 +129,7 @@ const existingImages = project.images;
                 type="text"
                 name="surface"
                 id="surface"
-                value={project.surface || ""}
+                value={project?.surface || ""}
                 placeholder="Ej: 266 m2"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
@@ -144,7 +144,7 @@ const existingImages = project.images;
                 type="text"
                 name="client"
                 id="client"
-                value={project.client || ""}
+                value={project?.client || ""}
                 placeholder="Ej: Privado"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
@@ -164,16 +164,16 @@ const existingImages = project.images;
               class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
             >
               {
-                existingImages.map((image) => (
+                existingImages?.map((image) => (
                   <div class="relative group h-32" data-image-wrapper-id={image.id}>
                     <img
-                      src={image.url}
+                      src={image?.url}
                       alt="Vista previa de la imagen"
                       class="w-full h-full object-cover rounded-md"
                     />
                     <button
                       type="button"
-                      data-image-id={image.id}
+                      data-image-id={image?.id}
                       class="delete-image-btn absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                       title="Eliminar imagen"
                     >
@@ -197,7 +197,7 @@ const existingImages = project.images;
                         type="radio"
                         name="thumbnail"
                         title="Seleccionar como portada"
-                        value={`image:${image.id}`}
+                        value={`image:${image?.id}`}
                         checked={image.isThumbnail}
                         class="h-5 w-5 cursor-pointer accent-blue-500"
                       />
@@ -345,7 +345,7 @@ const existingImages = project.images;
         window.location.href = "/admin/proyectos"; // Corrected URL
       }, 1500);
     } catch (error) {
-      statusMessage.textContent = error.message;
+      statusMessage.textContent = "Hubo un error! Chequea el peso de las imagenes o llena todos los campos!";
       statusMessage.className = "mt-6 text-center font-medium text-red-600";
       submitButton.disabled = false;
       submitButton.textContent = originalButtonText;
