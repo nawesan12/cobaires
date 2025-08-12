@@ -48,7 +48,7 @@ const projects = await prisma.project.findMany({
 
             <div
               class="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-in-out scale-110 group-hover:scale-100 group-[.is-active]:scale-100"
-              style={`background-image: url('${project.images.find((e) => e.isThumbnail).url}')`}
+              style={`background-image: url('${project?.images?.find((e) => e.isThumbnail)?.url}')`}
             />
 
             <div
