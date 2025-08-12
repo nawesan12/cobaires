@@ -28,7 +28,7 @@ if (!project) {
     });
 }
 
-const imageUrls = project.images.map((img) => img.url);
+const imageUrls = project?.images?.map((img) => img.url);
 ---
 
 <Layout>
@@ -60,11 +60,11 @@ const imageUrls = project.images.map((img) => img.url);
             class="px-4 lg:px-0 lg:max-w-4xl mx-auto flex flex-col w-full gap-11"
         >
             <h2 class="font-medium text-3xl text-[#051314]">
-                {project.title}
+                {project?.title}
             </h2>
 
             <p class="text-gray-700 leading-relaxed whitespace-pre-line">
-                {project.description}
+                {project?.description}
             </p>
 
             <ul class="flex flex-col gap-4 mb-20">
@@ -75,56 +75,56 @@ const imageUrls = project.images.map((img) => img.url);
                         >Proyecto</span
                     >
                     <p class="text-lg font-light text-[#051314]">
-                        {project.title}
+                        {project?.title}
                     </p>
                 </li>
-                {project.type && (
+                {project?.type && (
                     <li class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3">
                         <span class="text-lg font-semibold text-[#051314]">
                             Tipo
                         </span>
                         <p class="text-lg font-light text-[#051314]">
-                            {project.type}
+                            {project?.type}
                         </p>
                     </li>
                 )}
-                {project.location && (
+                {project?.location && (
                     <li class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3">
                         <span class="text-lg font-semibold text-[#051314]">
                             Locación
                         </span>
                         <p class="text-lg font-light text-[#051314]">
-                            {project.location}
+                            {project?.location}
                         </p>
                     </li>
                 )}
-                {project.year && (
+                {project?.year && (
                     <li class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3">
                         <span class="text-lg font-semibold text-[#051314]">
                             Año
                         </span>
                         <p class="text-lg font-light text-[#051314]">
-                            {project.year}
+                            {project?.year}
                         </p>
                     </li>
                 )}
-                {project.surface && (
+                {project?.surface && (
                     <li class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3">
                         <span class="text-lg font-semibold text-[#051314]">
                             Superficie
                         </span>
                         <p class="text-lg font-light text-[#051314]">
-                            {project.surface} m²
+                            {project?.surface} m²
                         </p>
                     </li>
                 )}
-                {project.client && (
+                {project?.client && (
                     <li class="border-b border-black grid grid-cols-[180px_1fr] gap-x-6 py-3">
                         <span class="text-lg font-semibold text-[#051314]">
                             Cliente
                         </span>
                         <p class="text-lg font-light text-[#051314]">
-                            {project.client}
+                            {project?.client}
                         </p>
                     </li>
                 )}
